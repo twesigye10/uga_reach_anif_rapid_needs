@@ -41,6 +41,15 @@ df_survey_time <- check_survey_time(input_tool_data = df_tool_data,
 add_checks_data_to_list(input_list_name = "logic_output",input_df_name = "df_survey_time")
 
 
+# check the time between surveys
+min_time_btn_surveys <- 5
+
+df_time_btn_surveys <- check_time_interval_btn_surveys(input_tool_data = df_tool_data, 
+                                                       input_min_time = min_time_btn_surveys)
+
+add_checks_data_to_list(input_list_name = "logic_output",input_df_name = "df_time_btn_surveys")
+
+
 
 
 
