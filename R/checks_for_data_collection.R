@@ -17,8 +17,8 @@ df_tool_data <- readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Data.xls
          start = as_date(start),
          end = as_datetime(end))
 
-df_survey <- readxl::read_excel("inputs/ANIF_Rapid_Assessment_Tool.xlsx", sheet = "survey")
-df_choices <- readxl::read_excel("inputs/ANIF_Rapid_Assessment_Tool.xlsx", sheet = "choices")
+df_survey <- readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Tool.xlsx", sheet = "survey")
+df_choices <- readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Tool.xlsx", sheet = "choices")
 
 df_sample_data <- sf::st_read("inputs/", quiet = TRUE)
 
@@ -27,12 +27,18 @@ df_sample_data <- sf::st_read("inputs/", quiet = TRUE)
 logic_output <- list()
 
 
-# check time --------------------------------------------------------------
+# Time checks -------------------------------------------------------------
 
-df_
+# Time interval for the survey
+min_time_of_survey <- 20
+max_time_of_survey <- 120
 
 
+df_survey_time <- check_survey_time(input_tool_data = df_tool_data, 
+                                    input_min_time = min_time_of_survey,
+                                    input_max_time = max_time_of_survey)
 
+add_checks_data_to_list(input_list_name = "logic_output",input_df_name = "df_survey_time")
 
 
 
