@@ -223,6 +223,31 @@ df_cooking_fuel_access <- df_tool_data %>%
 add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_cooking_fuel_access")
 
 
+# If hh currently has no access electricity i.e. access_to_electricity = "no_we_do_not_have_access_to_any_source_of_electricity" and time walking to electricity source i.e
+# time_walking_to_electricity_source = "less_than_30_minutes", check
+df_access_to_electricity <- df_tool_data %>% 
+  filter(access_to_electricity %in% c("no_we_do_not_have_access_to_any_source_of_electricity"), 
+         time_walking_to_electricity_source == "less_than_30_minutes") %>%
+  mutate(i.check.type = "change_response",
+         i.check.name = "access_to_electricity",
+         i.check.current_value = access_to_electricity,
+         i.check.value = "",
+         i.check.issue_id = "logic_issue_access_to_electricity_no",
+         i.check.issue = glue("access_to_electricity: {access_to_electricity}, but 
+                              time_walking_to_electricity_source: {time_walking_to_electricity_source}"),
+         i.check.other_text = "",
+         i.check.checked_by = "",
+         i.check.checked_date = as_date(today()),
+         i.check.comment = "", 
+         i.check.reviewed = "",
+         i.check.adjust_log = "",
+         i.check.uuid_cl = "",
+         i.check.so_sm_choices = "") %>%
+  dplyr::select(starts_with("i.check.")) %>% 
+  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_access_to_electricity")
+
 
 
 
