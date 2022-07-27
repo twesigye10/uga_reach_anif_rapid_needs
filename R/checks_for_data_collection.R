@@ -20,7 +20,7 @@ df_tool_data <- readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Data.xls
 df_survey <- readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Tool.xlsx", sheet = "survey")
 df_choices <- readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Tool.xlsx", sheet = "choices")
 
-df_sample_data <- sf::st_read("inputs/", quiet = TRUE)
+df_sample_data <- sf::st_read("inputs/anif_rapid_settlement_samples.gpkg", quiet = TRUE)
 
 # output holder -----------------------------------------------------------
 
@@ -50,6 +50,11 @@ df_time_btn_surveys <- check_time_interval_btn_surveys(input_tool_data = df_tool
 add_checks_data_to_list(input_list_name = "logic_output",input_df_name = "df_time_btn_surveys")
 
 
+# outlier checks ----------------------------------------------------------
+
+df_c_outliers <- checksupporteR::check_outliers_cleaninginspector(input_tool_data = df_tool_data)
+
+add_checks_data_to_list(input_list_name = "logic_output",input_df_name = "df_c_outliers")
 
 # spatial checks ----------------------------------------------------------
 
@@ -146,10 +151,14 @@ add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_hh
 
 df_does_not_have_any_food_category_in_stock <- df_tool_data %>% 
   filter()
-  
 
+
+
+df_combined_checks <- bind_rows(logic_output)
     
-    
+# output the resulting data frame
+write_csv(x = df_combined_checks, file = paste0("outputs/", butteR::date_file_prefix(), "_combined_checks_anif.csv"), na = "")
+
     
   
   
