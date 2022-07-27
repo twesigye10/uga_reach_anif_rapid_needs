@@ -301,6 +301,30 @@ df_family_main_fd_source <- df_tool_data %>%
 add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_family_main_fd_source")
 
 
+# If number of school aged children is not equal to number currently enrolled in school  i.e. 
+#children_enrolled_in_school != school_aged_children 
+df_children_enrolled_in_school <- df_tool_data %>% 
+  filter(children_enrolled_in_school != school_aged_children ) %>%
+  mutate(i.check.type = "change_response",
+         i.check.name = "children_enrolled_in_school",
+         i.check.current_value = children_enrolled_in_school,
+         i.check.value = "",
+         i.check.issue_id = "logic_issue_children_enrolled_in_school_less",
+         i.check.issue = glue("children_enrolled_in_school: {children_enrolled_in_school}, 
+                              but school_aged_children: {school_aged_children}"),
+         i.check.other_text = "",
+         i.check.checked_by = "",
+         i.check.checked_date = as_date(today()),
+         i.check.comment = "", 
+         i.check.reviewed = "",
+         i.check.adjust_log = "",
+         i.check.uuid_cl = "",
+         i.check.so_sm_choices = "") %>% 
+  dplyr::select(starts_with("i.check.")) %>% 
+  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_children_enrolled_in_school")
+
 
 
 
