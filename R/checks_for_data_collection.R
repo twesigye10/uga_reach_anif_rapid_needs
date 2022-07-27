@@ -124,31 +124,7 @@ df_educ_level_above_primary_but_cannot_count_money <- df_tool_data %>%
 add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_educ_level_above_primary_but_cannot_count_money")    
     
 
-# hh_members_currently_eating_less_than_two_meals_yet_they_reported_eating_more_than_in_home_country
-
-df_hh_currently_eating_less_than_two_meals <- df_tool_data %>%
-  filter(average_daily_fd_consumption == "less_than_two_meals", food_amount_change == "we_are_now_eating_more_than_we_were_in_our_home_country") %>% 
-  mutate(i.check.type = "change_response",
-         i.check.name = "average_daily_fd_consumption",
-         i.check.current_value = average_daily_fd_consumption,
-         i.check.value = "",
-         i.check.issue_id = "logic_c_hh_currently_eating_less_than_two_meals",
-         i.check.issue = glue("average_daily_fd_consumption: {average_daily_fd_consumption}"),
-         i.check.other_text = "",
-         i.check.checked_by = "",
-         i.check.checked_date = as_date(today()),
-         i.check.comment = "accept", 
-         i.check.reviewed = "",
-         i.check.adjust_log = "",
-         i.check.uuid_cl = "",
-         i.check.so_sm_choices = "") %>% 
-  dplyr::select(starts_with("i.check"))%>% 
-  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
-
-add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_hh_currently_eating_less_than_two_meals")    
-
 # If completed primary and above but can not allocate money to priorities i.e. "do you......" is "none", check
-
 df_money_usage <- df_tool_data %>% 
   filter(respondent_education %in% c("completed_primary", "incomplete_secondary", "completed_secondary", "incomplete_tertiary", 
                                      "completed_tertiary") , money_usage == "none") %>%
@@ -170,6 +146,31 @@ df_money_usage <- df_tool_data %>%
   rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
 
 add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_money_usage")
+
+# If average meals eaten a day i.e "average_daily_fd_consumption" = "three_meals" and "more_than_three_meals" and amount of food hh 
+# members are currently eating i.e. "food_amount_change = "we_are_now_eating_less_than_we_were_in_our_home_country", check
+df_average_daily_fd_consumption <- df_anif_logical_data %>% 
+  filter(average_daily_fd_consumption %in% c("more_than_three_meals", "three_meals") , 
+         food_amount_change == "we_are_now_eating_less_than_we_were_in_our_home_country") %>%
+  mutate(i.check.type = "change_response",
+         i.check.name = "food_amount_change",
+         i.check.current_value = food_amount_change,
+         i.check.value = "",
+         i.check.issue_id = "logic_issue_food_amount_change",
+         i.check.issue = glue("food_amount_change: {food_amount_change}, but average_daily_fd_consumption: {average_daily_fd_consumption}"),
+         i.check.other_text = "",
+         i.check.checked_by = "",
+         i.check.checked_date = as_date(today()),
+         i.check.comment = "", 
+         i.check.reviewed = "",
+         i.check.adjust_log = "",
+         i.check.uuid_cl = "",
+         i.check.so_sm_choices = "") %>% 
+  dplyr::select(starts_with("i.check.")) %>% 
+  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_average_daily_fd_consumption")
+
 
 
 
