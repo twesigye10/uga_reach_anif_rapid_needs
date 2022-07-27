@@ -50,6 +50,11 @@ df_time_btn_surveys <- check_time_interval_btn_surveys(input_tool_data = df_tool
 add_checks_data_to_list(input_list_name = "logic_output",input_df_name = "df_time_btn_surveys")
 
 
+# outlier checks ----------------------------------------------------------
+
+df_c_outliers <- checksupporteR::check_outliers_cleaninginspector(input_tool_data = df_tool_data)
+
+add_checks_data_to_list(input_list_name = "logic_output",input_df_name = "df_c_outliers")
 
 # spatial checks ----------------------------------------------------------
 
