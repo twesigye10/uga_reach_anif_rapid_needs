@@ -249,6 +249,37 @@ df_access_to_electricity <- df_tool_data %>%
 add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_access_to_electricity")
 
 
+# If hh currently accesses electricity throuh solar i.e. access_to_electricity = "yes_we_have_a_solar_panel" and  
+# asset hh owns there is no solar i.e hh_access_to_asset_ownership != "solar_panel", check
+
+df_hh_access_to_asset_ownership <- df_tool_data %>% 
+  filter(access_to_electricity %in% c("yes_we_have_a_solar_panel"), 
+         hh_access_to_asset_ownership != "solar_panel") %>%
+  mutate(i.check.type = "change_response",
+         i.check.name = "access_to_electricity",
+         i.check.current_value = access_to_electricity,
+         i.check.value = "",
+         i.check.issue_id = "logic_issue_access_to_electricity_yes_solar",
+         i.check.issue = glue("access_to_electricity: {access_to_electricity}, but 
+                              hh_access_to_asset_ownership: {hh_access_to_asset_ownership}"),
+         i.check.other_text = "",
+         i.check.checked_by = "",
+         i.check.checked_date = as_date(today()),
+         i.check.comment = "", 
+         i.check.reviewed = "",
+         i.check.adjust_log = "",
+         i.check.uuid_cl = "",
+         i.check.so_sm_choices = "") %>%
+  dplyr::select(starts_with("i.check.")) %>% 
+  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_hh_access_to_asset_ownership")
+
+
+
+
+
+
 
 
 
