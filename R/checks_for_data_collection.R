@@ -326,6 +326,29 @@ df_children_enrolled_in_school <- df_tool_data %>%
 add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_children_enrolled_in_school")
 
 
+# If average daily meals are i.e. average_daily_fd_consumption = "three_meals", "more_than_three_meals" 
+# and food in stock i.e food_category = none, check
+df_food_stock_category <- df_tool_data %>% 
+  filter(average_daily_fd_consumption %in% c("three_meals", "more_than_three_meals"), food_category == "none") %>%
+  mutate(i.check.type = "change_response",
+         i.check.name = "food_category",
+         i.check.current_value = food_category,
+         i.check.value = "",
+         i.check.issue_id = "logic_issue_food_category_stock_none",
+         i.check.issue = glue("food_category: {food_category}, 
+                              but average_daily_fd_consumption: {average_daily_fd_consumption}"),
+         i.check.other_text = "",
+         i.check.checked_by = "",
+         i.check.checked_date = as_date(today()),
+         i.check.comment = "", 
+         i.check.reviewed = "",
+         i.check.adjust_log = "",
+         i.check.uuid_cl = "",
+         i.check.so_sm_choices = "") %>% 
+  dplyr::select(starts_with("i.check.")) %>% 
+  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_food_stock_category")
 
 
 
