@@ -276,6 +276,31 @@ df_hh_access_to_asset_ownership <- df_tool_data %>%
 add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_hh_access_to_asset_ownership")
 
 
+# If hh main source of food is i.e. family_main_fd_source = "humanitarian_assistance" but hh has never received humanitarian assistance i.e.
+# access_humanitarian_assistance = "no", check
+df_family_main_fd_source <- df_tool_data %>% 
+  filter(family_main_fd_source %in% c("humanitarian_assistance"), access_humanitarian_assistance == "no") %>%
+  mutate(i.check.type = "change_response",
+         i.check.name = "access_humanitarian_assistance",
+         i.check.current_value = access_humanitarian_assistance,
+         i.check.value = "",
+         i.check.issue_id = "logic_issue_access_humanitarian_assistance_no",
+         i.check.issue = glue("access_humanitarian_assistance: {access_humanitarian_assistance}, 
+                              but family_main_fd_source: {family_main_fd_source}"),
+         i.check.other_text = "",
+         i.check.checked_by = "",
+         i.check.checked_date = as_date(today()),
+         i.check.comment = "", 
+         i.check.reviewed = "",
+         i.check.adjust_log = "",
+         i.check.uuid_cl = "",
+         i.check.so_sm_choices = "") %>% 
+  dplyr::select(starts_with("i.check.")) %>% 
+  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_family_main_fd_source")
+
+
 
 
 
