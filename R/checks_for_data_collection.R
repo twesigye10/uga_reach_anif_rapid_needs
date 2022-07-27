@@ -113,7 +113,7 @@ df_educ_level_above_primary_but_cannot_count_money <- df_tool_data %>%
          i.check.other_text = "",
          i.check.checked_by = "",
          i.check.checked_date = as_date(today()),
-         i.check.comment = "accept", 
+         i.check.comment = "FO to follow up with enumerator", 
          i.check.reviewed = "",
          i.check.adjust_log = "",
          i.check.uuid_cl = "",
@@ -124,33 +124,235 @@ df_educ_level_above_primary_but_cannot_count_money <- df_tool_data %>%
 add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_educ_level_above_primary_but_cannot_count_money")    
     
 
-# hh_members_currently_eating_less_than_two_meals_yet_they_reported_eating_more_than_in_home_country
-
-df_hh_currently_eating_less_than_two_meals <- df_tool_data %>%
-  filter(average_daily_fd_consumption == "less_than_two_meals", food_amount_change == "we_are_now_eating_more_than_we_were_in_our_home_country") %>% 
-  mutate(i.check.type = "change_response",
-         i.check.name = "average_daily_fd_consumption",
-         i.check.current_value = average_daily_fd_consumption,
+# If completed primary and above but can not allocate money to priorities i.e. "do you......" is "none", check
+df_money_usage <- df_tool_data %>% 
+  filter(respondent_education %in% c("completed_primary", "incomplete_secondary", "completed_secondary", "incomplete_tertiary", 
+                                     "completed_tertiary") , money_usage == "none") %>%
+  mutate(i.check.type = "remove_option",
+         i.check.name = "money_usage",
+         i.check.current_value = money_usage,
          i.check.value = "",
-         i.check.issue_id = "logic_c_hh_currently_eating_less_than_two_meals",
-         i.check.issue = glue("average_daily_fd_consumption: {average_daily_fd_consumption}"),
+         i.check.issue_id = "logic_issue_money_usage",
+         i.check.issue = glue("respondent_education: {respondent_education}, but money_usage: {money_usage}"),
          i.check.other_text = "",
          i.check.checked_by = "",
          i.check.checked_date = as_date(today()),
-         i.check.comment = "accept", 
+         i.check.comment = "", 
+         i.check.reviewed = "",
+         i.check.adjust_log = "",
+         i.check.uuid_cl = "",
+         i.check.so_sm_choices = "") %>%
+  dplyr::select(starts_with("i.check.")) %>% 
+  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_money_usage")
+
+
+# If average meals eaten a day i.e "average_daily_fd_consumption" = "three_meals" and "more_than_three_meals" and amount of food hh 
+# members are currently eating i.e. "food_amount_change = "we_are_now_eating_less_than_we_were_in_our_home_country", check
+df_average_daily_fd_consumption <- df_tool_data %>% 
+  filter(average_daily_fd_consumption %in% c("more_than_three_meals", "three_meals") , 
+         food_amount_change == "we_are_now_eating_less_than_we_were_in_our_home_country") %>%
+  mutate(i.check.type = "change_response",
+         i.check.name = "food_amount_change",
+         i.check.current_value = food_amount_change,
+         i.check.value = "",
+         i.check.issue_id = "logic_issue_food_amount_change",
+         i.check.issue = glue("food_amount_change: {food_amount_change}, but average_daily_fd_consumption: {average_daily_fd_consumption}"),
+         i.check.other_text = "",
+         i.check.checked_by = "",
+         i.check.checked_date = as_date(today()),
+         i.check.comment = "", 
          i.check.reviewed = "",
          i.check.adjust_log = "",
          i.check.uuid_cl = "",
          i.check.so_sm_choices = "") %>% 
-  dplyr::select(starts_with("i.check"))%>% 
+  dplyr::select(starts_with("i.check.")) %>% 
   rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
 
-add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_hh_currently_eating_less_than_two_meals")    
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_average_daily_fd_consumption")
 
-# hh_not_having_any_food_categories_in_stock
 
-df_does_not_have_any_food_category_in_stock <- df_tool_data %>% 
-  filter()
+# If average meals eaten a day i.e average_daily_fd_consumption = "less_than_two_meals" and 
+# food_amount_change = "we_are_now_eating_more_than_we_were_in_our_home_country", check
+df_food_amount_change <- df_tool_data %>% 
+  filter(food_amount_change %in% c("we_are_now_eating_more_than_we_were_in_our_home_country") , 
+         average_daily_fd_consumption == "less_than_two_meals") %>%
+  mutate(i.check.type = "change_response",
+         i.check.name = "average_daily_fd_consumption",
+         i.check.current_value = average_daily_fd_consumption,
+         i.check.value = "",
+         i.check.issue_id = "logic_issue_average_daily_fd_consumption",
+         i.check.issue = glue("food_amount_change: {food_amount_change}, but average_daily_fd_consumption: {average_daily_fd_consumption}"),
+         i.check.other_text = "",
+         i.check.checked_by = "",
+         i.check.checked_date = as_date(today()),
+         i.check.comment = "", 
+         i.check.reviewed = "",
+         i.check.adjust_log = "",
+         i.check.uuid_cl = "",
+         i.check.so_sm_choices = "")%>% 
+  dplyr::select(starts_with("i.check.")) %>% 
+  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_food_amount_change")
+
+
+# If hh currently has no access to cooking fuel i.e. cooking_fuel_access = "no" and 
+# barriers_accessing_cooking_fuel = "we_do_not_face_any_barriers_to_accessing_fuel_for_cooking", check
+df_cooking_fuel_access <- df_tool_data %>% 
+  filter(barriers_accessing_cooking_fuel %in% c("we_do_not_face_any_barriers_to_accessing_fuel_for_cooking"), 
+         cooking_fuel_access == "no") %>%
+  mutate(i.check.type = "remove_option",
+         i.check.name = "barriers_accessing_cooking_fuel",
+         i.check.current_value = barriers_accessing_cooking_fuel,
+         i.check.value = "",
+         i.check.issue_id = "logic_issue_barriers_accessing_cooking_fuel_no",
+         i.check.issue = glue("barriers_accessing_cooking_fuel: {barriers_accessing_cooking_fuel}, but cooking_fuel_access: {cooking_fuel_access}"),
+         i.check.other_text = "",
+         i.check.checked_by = "",
+         i.check.checked_date = as_date(today()),
+         i.check.comment = "", 
+         i.check.reviewed = "",
+         i.check.adjust_log = "",
+         i.check.uuid_cl = "",
+         i.check.so_sm_choices = "") %>% 
+  dplyr::select(starts_with("i.check.")) %>% 
+  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_cooking_fuel_access")
+
+
+# If hh currently has no access electricity i.e. access_to_electricity = "no_we_do_not_have_access_to_any_source_of_electricity" and time walking to electricity source i.e
+# time_walking_to_electricity_source = "less_than_30_minutes", check
+df_access_to_electricity <- df_tool_data %>% 
+  filter(access_to_electricity %in% c("no_we_do_not_have_access_to_any_source_of_electricity"), 
+         time_walking_to_electricity_source == "less_than_30_minutes") %>%
+  mutate(i.check.type = "change_response",
+         i.check.name = "access_to_electricity",
+         i.check.current_value = access_to_electricity,
+         i.check.value = "",
+         i.check.issue_id = "logic_issue_access_to_electricity_no",
+         i.check.issue = glue("access_to_electricity: {access_to_electricity}, but 
+                              time_walking_to_electricity_source: {time_walking_to_electricity_source}"),
+         i.check.other_text = "",
+         i.check.checked_by = "",
+         i.check.checked_date = as_date(today()),
+         i.check.comment = "", 
+         i.check.reviewed = "",
+         i.check.adjust_log = "",
+         i.check.uuid_cl = "",
+         i.check.so_sm_choices = "") %>%
+  dplyr::select(starts_with("i.check.")) %>% 
+  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_access_to_electricity")
+
+
+# If hh currently accesses electricity throuh solar i.e. access_to_electricity = "yes_we_have_a_solar_panel" and  
+# asset hh owns there is no solar i.e hh_access_to_asset_ownership != "solar_panel", check
+
+df_hh_access_to_asset_ownership <- df_tool_data %>% 
+  filter(access_to_electricity %in% c("yes_we_have_a_solar_panel"), 
+         hh_access_to_asset_ownership != "solar_panel") %>%
+  mutate(i.check.type = "change_response",
+         i.check.name = "access_to_electricity",
+         i.check.current_value = access_to_electricity,
+         i.check.value = "",
+         i.check.issue_id = "logic_issue_access_to_electricity_yes_solar",
+         i.check.issue = glue("access_to_electricity: {access_to_electricity}, but 
+                              hh_access_to_asset_ownership: {hh_access_to_asset_ownership}"),
+         i.check.other_text = "",
+         i.check.checked_by = "",
+         i.check.checked_date = as_date(today()),
+         i.check.comment = "", 
+         i.check.reviewed = "",
+         i.check.adjust_log = "",
+         i.check.uuid_cl = "",
+         i.check.so_sm_choices = "") %>%
+  dplyr::select(starts_with("i.check.")) %>% 
+  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_hh_access_to_asset_ownership")
+
+
+# If hh main source of food is i.e. family_main_fd_source = "humanitarian_assistance" but hh has never received humanitarian assistance i.e.
+# access_humanitarian_assistance = "no", check
+df_family_main_fd_source <- df_tool_data %>% 
+  filter(family_main_fd_source %in% c("humanitarian_assistance"), access_humanitarian_assistance == "no") %>%
+  mutate(i.check.type = "change_response",
+         i.check.name = "access_humanitarian_assistance",
+         i.check.current_value = access_humanitarian_assistance,
+         i.check.value = "",
+         i.check.issue_id = "logic_issue_access_humanitarian_assistance_no",
+         i.check.issue = glue("access_humanitarian_assistance: {access_humanitarian_assistance}, 
+                              but family_main_fd_source: {family_main_fd_source}"),
+         i.check.other_text = "",
+         i.check.checked_by = "",
+         i.check.checked_date = as_date(today()),
+         i.check.comment = "", 
+         i.check.reviewed = "",
+         i.check.adjust_log = "",
+         i.check.uuid_cl = "",
+         i.check.so_sm_choices = "") %>% 
+  dplyr::select(starts_with("i.check.")) %>% 
+  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_family_main_fd_source")
+
+
+# If number of school aged children is not equal to number currently enrolled in school  i.e. 
+#children_enrolled_in_school != school_aged_children 
+df_children_enrolled_in_school <- df_tool_data %>% 
+  filter(children_enrolled_in_school != school_aged_children ) %>%
+  mutate(i.check.type = "change_response",
+         i.check.name = "children_enrolled_in_school",
+         i.check.current_value = children_enrolled_in_school,
+         i.check.value = "",
+         i.check.issue_id = "logic_issue_children_enrolled_in_school_less",
+         i.check.issue = glue("children_enrolled_in_school: {children_enrolled_in_school}, 
+                              but school_aged_children: {school_aged_children}"),
+         i.check.other_text = "",
+         i.check.checked_by = "",
+         i.check.checked_date = as_date(today()),
+         i.check.comment = "", 
+         i.check.reviewed = "",
+         i.check.adjust_log = "",
+         i.check.uuid_cl = "",
+         i.check.so_sm_choices = "") %>% 
+  dplyr::select(starts_with("i.check.")) %>% 
+  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_children_enrolled_in_school")
+
+
+# If average daily meals are i.e. average_daily_fd_consumption = "three_meals", "more_than_three_meals" 
+# and food in stock i.e food_category = none, check
+df_food_stock_category <- df_tool_data %>% 
+  filter(average_daily_fd_consumption %in% c("three_meals", "more_than_three_meals"), food_category == "none") %>%
+  mutate(i.check.type = "change_response",
+         i.check.name = "food_category",
+         i.check.current_value = food_category,
+         i.check.value = "",
+         i.check.issue_id = "logic_issue_food_category_stock_none",
+         i.check.issue = glue("food_category: {food_category}, 
+                              but average_daily_fd_consumption: {average_daily_fd_consumption}"),
+         i.check.other_text = "",
+         i.check.checked_by = "",
+         i.check.checked_date = as_date(today()),
+         i.check.comment = "", 
+         i.check.reviewed = "",
+         i.check.adjust_log = "",
+         i.check.uuid_cl = "",
+         i.check.so_sm_choices = "") %>% 
+  dplyr::select(starts_with("i.check.")) %>% 
+  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_food_stock_category")
+
+
+
+
 
 
 
