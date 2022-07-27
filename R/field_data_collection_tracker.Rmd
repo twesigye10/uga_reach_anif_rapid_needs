@@ -23,7 +23,7 @@ library(leaflet)
 
 # read data 
 
-df_settlement_samples <- readr::read_csv("../inputs/anif_survey_samples_definition.csv") %>% 
+df_settlement_samples <- readr::read_csv("../inputs/Refugee_anif_survey_samples_definition.csv") %>% 
   filter(!is.na(settlement), sample_size > 0)
 
 df_for_colnames <- df_settlement_samples %>% 
@@ -48,11 +48,10 @@ df_tool_data <- readxl::read_excel("../inputs/ANIF_Rapid_Assessment_Data.xlsx") 
          start_date = as_date(start),
          start = as_datetime(start),
          end = as_datetime(end),
-         sub_county_div = as.character(sub_county_div),
          latitude = as.numeric(`_geopoint_latitude`),
          longitude = as.numeric(`_geopoint_longitude`)) %>% 
-  filter(consent == "yes",
-         start_date > as_date("2022-07-27"), 
+  filter(consent_one == "yes",
+         start_date > as_date("2022-07-25"), 
          !str_detect(string = point_number, pattern = fixed('test', ignore_case = TRUE))
          )    
 
@@ -62,7 +61,7 @@ df_days_for_data_collection <- df_tool_data %>% select(start_date) %>% unique() 
 df_data_support_cl_log <- df_tool_data %>% 
   select(uuid, refugee_settlement, latitude,	longitude )
 # cleaning log handling
-df_cl_log <- read_csv(file = "../inputs/combined_checks_anif.csv") %>% 
+df_cl_log <- read_csv(file = "../inputs/20220727_combined_checks_anif.csv") %>% 
   mutate(adjust_log = ifelse(is.na(adjust_log), "apply_suggested_change", adjust_log)) %>% 
   left_join(df_data_support_cl_log, by = "uuid")
 
@@ -163,10 +162,10 @@ dt_enum_performance_options <- function(x){
 
 ```{r, echo = FALSE}
 
-df_refugee_samp_per_settlement <- df_sample_breakdown
+# df_refugee_samp_per_settlement <- df_sample_breakdown
 
 df_cl_surveys_for_deletion <- df_cl_log %>%
-  filter(type == "remove_survey", reviewed == 1, adjust_log != "delete_log") %>%
+  filter(type == "remove_survey", reviewed == 1, adjust_log %in% c("delete_log")) %>%
   group_by(refugee_settlement) %>%
   distinct(uuid) %>%
   summarise(surveys_for_deletion = n())
