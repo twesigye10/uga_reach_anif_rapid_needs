@@ -50,9 +50,9 @@ df_tool_data <- readxl::read_excel("../inputs/ANIF_Rapid_Assessment_Data.xlsx") 
          end = as_datetime(end),
          latitude = as.numeric(`_geopoint_latitude`),
          longitude = as.numeric(`_geopoint_longitude`)) %>% 
-  filter(consent_one == "yes",
-         start_date > as_date("2022-07-25"), 
-         !str_detect(string = point_number, pattern = fixed('test', ignore_case = TRUE))
+  filter(consent_two == "yes",
+         start_date > as_date("2022-07-24"), 
+         # !str_detect(string = point_number, pattern = fixed('test', ignore_case = TRUE))
          )    
 
 # days that contain data
@@ -162,7 +162,10 @@ dt_enum_performance_options <- function(x){
 
 ```{r, echo = FALSE}
 
-# df_refugee_samp_per_settlement <- df_sample_breakdown
+df_refugee_samp_per_settlement <- df_settlement_samples_required %>% 
+  group_by(refugee_settlement) %>% 
+  summarise(required_samples = sum(sample_size, na.rm = TRUE))
+
 
 df_cl_surveys_for_deletion <- df_cl_log %>%
   filter(type == "remove_survey", reviewed == 1, adjust_log %in% c("delete_log")) %>%
@@ -180,11 +183,12 @@ df_updated_tool_data %>%
   mutate(number_of_surveys = ifelse(is.na(number_of_surveys), 0, number_of_surveys),
          surveys_for_deletion = ifelse(is.na(surveys_for_deletion), 0, surveys_for_deletion),
          int.surveys_and_deletion = number_of_surveys - surveys_for_deletion,
-         remaining_surveys = sample_size - int.surveys_and_deletion ) %>%
+         remaining_surveys = required_samples - int.surveys_and_deletion ) %>%
   select(-refugee_settlement) %>%
-  rename(district_name = district_name.x) %>%
-  mutate(district_name = district_name.y) %>%
-  select(-c(int.surveys_and_deletion, district_name.y)) %>%
+  # rename(district_name = district_name.x) %>%
+  # mutate(district_name = district_name.y) %>%
+  # select(-c(int.surveys_and_deletion, district_name.y)) %>%
+  select(-c(int.surveys_and_deletion)) %>%
   dt_with_modified_options()
 ```
 
@@ -239,43 +243,43 @@ df_cl_log %>%
   dt_options_fewcols()
 ```
 
-### Map of surveys for deletion
+<!-- ### Map of surveys for deletion -->
 
-```{r, echo = FALSE, out.width="100%"}
-# popup
-labels_pts <- ~sprintf(
-  "<strong>Settlement Name: %s</strong><br/>
-      Point Number :  <strong>%s</strong><br/>
-      Issue ID :  <strong>%s</strong><br/>
-      Issue :  <strong>%s</strong><br/>
-      Enumerator ID :  <strong>%s</strong>",
-  refugee_settlement, point_number, issue_id, issue, enumerator_id
-) %>% 
-  lapply(htmltools::HTML)
+<!-- ```{r, echo = FALSE, out.width="100%"} -->
+<!-- # popup -->
+<!-- labels_pts <- ~sprintf( -->
+<!--   "<strong>Settlement Name: %s</strong><br/> -->
+<!--       Point Number :  <strong>%s</strong><br/> -->
+<!--       Issue ID :  <strong>%s</strong><br/> -->
+<!--       Issue :  <strong>%s</strong><br/> -->
+<!--       Enumerator ID :  <strong>%s</strong>", -->
+<!--   refugee_settlement, point_number, issue_id, issue, enumerator_id -->
+<!-- ) %>%  -->
+<!--   lapply(htmltools::HTML) -->
 
-df_cl_log %>% 
-  filter(type == "remove_survey", reviewed == 1, adjust_log != "delete_log") %>% 
-  group_by(uuid, refugee_settlement, latitude, longitude) %>% 
-  summarise(start_date = paste(start_date, collapse = " : "),
-            enumerator_id = paste(enumerator_id, collapse = " : "),
-            district_name = paste(district_name, collapse = " : "),
-            point_number = paste(point_number, collapse = " : "),
-            type = paste(type, collapse = " : "),
-            name = paste(name, collapse = " : "),
-            current_value = paste(current_value, collapse = " : "),
-            value = paste(value, collapse = " : "),
-            issue_id = paste(issue_id, collapse = " : "),
-            issue = paste(issue, collapse = " : ")
-  ) %>% 
-  unique() %>% 
-  leaflet() %>% 
-  addTiles() %>%
-  addCircleMarkers(~longitude,
-                   ~latitude,
-                   popup = labels_pts,
-                   radius = 10,
-                   color = "red",
-                   stroke = FALSE, fillOpacity = 0.9,
-                   label = labels_pts,
-                   clusterOptions = markerClusterOptions())
-```
+<!-- df_cl_log %>%  -->
+<!--   filter(type == "remove_survey", reviewed == 1, adjust_log != "delete_log") %>%  -->
+<!--   group_by(uuid, refugee_settlement, latitude, longitude) %>%  -->
+<!--   summarise(start_date = paste(start_date, collapse = " : "), -->
+<!--             enumerator_id = paste(enumerator_id, collapse = " : "), -->
+<!--             district_name = paste(district_name, collapse = " : "), -->
+<!--             point_number = paste(point_number, collapse = " : "), -->
+<!--             type = paste(type, collapse = " : "), -->
+<!--             name = paste(name, collapse = " : "), -->
+<!--             current_value = paste(current_value, collapse = " : "), -->
+<!--             value = paste(value, collapse = " : "), -->
+<!--             issue_id = paste(issue_id, collapse = " : "), -->
+<!--             issue = paste(issue, collapse = " : ") -->
+<!--   ) %>%  -->
+<!--   unique() %>%  -->
+<!--   leaflet() %>%  -->
+<!--   addTiles() %>% -->
+<!--   addCircleMarkers(~longitude, -->
+<!--                    ~latitude, -->
+<!--                    popup = labels_pts, -->
+<!--                    radius = 10, -->
+<!--                    color = "red", -->
+<!--                    stroke = FALSE, fillOpacity = 0.9, -->
+<!--                    label = labels_pts, -->
+<!--                    clusterOptions = markerClusterOptions()) -->
+<!-- ``` -->
