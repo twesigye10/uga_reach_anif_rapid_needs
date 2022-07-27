@@ -113,7 +113,7 @@ df_educ_level_above_primary_but_cannot_count_money <- df_tool_data %>%
          i.check.other_text = "",
          i.check.checked_by = "",
          i.check.checked_date = as_date(today()),
-         i.check.comment = "accept", 
+         i.check.comment = "FO to follow up with enumerator", 
          i.check.reviewed = "",
          i.check.adjust_log = "",
          i.check.uuid_cl = "",
@@ -147,10 +147,30 @@ df_hh_currently_eating_less_than_two_meals <- df_tool_data %>%
 
 add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_hh_currently_eating_less_than_two_meals")    
 
-# hh_not_having_any_food_categories_in_stock
+# If completed primary and above but can not allocate money to priorities i.e. "do you......" is "none", check
 
-df_does_not_have_any_food_category_in_stock <- df_tool_data %>% 
-  filter()
+df_money_usage <- df_tool_data %>% 
+  filter(respondent_education %in% c("completed_primary", "incomplete_secondary", "completed_secondary", "incomplete_tertiary", 
+                                     "completed_tertiary") , money_usage == "none") %>%
+  mutate(i.check.type = "remove_option",
+         i.check.name = "money_usage",
+         i.check.current_value = money_usage,
+         i.check.value = "",
+         i.check.issue_id = "logic_issue_money_usage",
+         i.check.issue = glue("respondent_education: {respondent_education}, but money_usage: {money_usage}"),
+         i.check.other_text = "",
+         i.check.checked_by = "",
+         i.check.checked_date = as_date(today()),
+         i.check.comment = "", 
+         i.check.reviewed = "",
+         i.check.adjust_log = "",
+         i.check.uuid_cl = "",
+         i.check.so_sm_choices = "") %>%
+  dplyr::select(starts_with("i.check.")) %>% 
+  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_money_usage")
+
 
 
 
