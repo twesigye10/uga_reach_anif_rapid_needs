@@ -149,7 +149,7 @@ add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_mo
 
 # If average meals eaten a day i.e "average_daily_fd_consumption" = "three_meals" and "more_than_three_meals" and amount of food hh 
 # members are currently eating i.e. "food_amount_change = "we_are_now_eating_less_than_we_were_in_our_home_country", check
-df_average_daily_fd_consumption <- df_anif_logical_data %>% 
+df_average_daily_fd_consumption <- df_tool_data %>% 
   filter(average_daily_fd_consumption %in% c("more_than_three_meals", "three_meals") , 
          food_amount_change == "we_are_now_eating_less_than_we_were_in_our_home_country") %>%
   mutate(i.check.type = "change_response",
@@ -171,6 +171,29 @@ df_average_daily_fd_consumption <- df_anif_logical_data %>%
 
 add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_average_daily_fd_consumption")
 
+# If average meals eaten a day i.e average_daily_fd_consumption = "less_than_two_meals" and 
+# food_amount_change = "we_are_now_eating_more_than_we_were_in_our_home_country", check
+df_food_amount_change <- df_tool_data %>% 
+  filter(food_amount_change %in% c("we_are_now_eating_more_than_we_were_in_our_home_country") , 
+         average_daily_fd_consumption == "less_than_two_meals") %>%
+  mutate(i.check.type = "change_response",
+         i.check.name = "average_daily_fd_consumption",
+         i.check.current_value = average_daily_fd_consumption,
+         i.check.value = "",
+         i.check.issue_id = "logic_issue_average_daily_fd_consumption",
+         i.check.issue = glue("food_amount_change: {food_amount_change}, but average_daily_fd_consumption: {average_daily_fd_consumption}"),
+         i.check.other_text = "",
+         i.check.checked_by = "",
+         i.check.checked_date = as_date(today()),
+         i.check.comment = "", 
+         i.check.reviewed = "",
+         i.check.adjust_log = "",
+         i.check.uuid_cl = "",
+         i.check.so_sm_choices = "")%>% 
+  dplyr::select(starts_with("i.check.")) %>% 
+  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_food_amount_change")
 
 
 
