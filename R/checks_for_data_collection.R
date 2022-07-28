@@ -114,7 +114,7 @@ df_educ_level_above_primary_but_cannot_count_money <- df_tool_data %>%
            knowledge_financial_literacy =="none") %>% 
   mutate(i.check.type = "change_response",
          i.check.name = "respondent_education",
-         i.check.current_value = respondent_education,
+         i.check.current_value = as.character(respondent_education),
          i.check.value = "",
          i.check.issue_id = "logic_c_educ_level_above_primary_but_cannot_count",
          i.check.issue = glue("knowledge_financial_literacy:{knowledge_financial_literacy}"),
@@ -137,7 +137,7 @@ df_money_usage <- df_tool_data %>%
                                      "completed_tertiary") , money_usage == "none") %>%
   mutate(i.check.type = "remove_option",
          i.check.name = "money_usage",
-         i.check.current_value = money_usage,
+         i.check.current_value = as.character(money_usage),
          i.check.value = "",
          i.check.issue_id = "logic_issue_money_usage",
          i.check.issue = glue("respondent_education: {respondent_education}, but money_usage: {money_usage}"),
@@ -161,7 +161,7 @@ df_average_daily_fd_consumption <- df_tool_data %>%
          food_amount_change == "we_are_now_eating_less_than_we_were_in_our_home_country") %>%
   mutate(i.check.type = "change_response",
          i.check.name = "food_amount_change",
-         i.check.current_value = food_amount_change,
+         i.check.current_value = as.character(food_amount_change),
          i.check.value = "",
          i.check.issue_id = "logic_issue_food_amount_change",
          i.check.issue = glue("food_amount_change: {food_amount_change}, but average_daily_fd_consumption: {average_daily_fd_consumption}"),
@@ -185,7 +185,7 @@ df_food_amount_change <- df_tool_data %>%
          average_daily_fd_consumption == "less_than_two_meals") %>%
   mutate(i.check.type = "change_response",
          i.check.name = "average_daily_fd_consumption",
-         i.check.current_value = average_daily_fd_consumption,
+         i.check.current_value = as.character(average_daily_fd_consumption),
          i.check.value = "",
          i.check.issue_id = "logic_issue_average_daily_fd_consumption",
          i.check.issue = glue("food_amount_change: {food_amount_change}, but average_daily_fd_consumption: {average_daily_fd_consumption}"),
@@ -209,7 +209,7 @@ df_cooking_fuel_access <- df_tool_data %>%
          cooking_fuel_access == "no") %>%
   mutate(i.check.type = "remove_option",
          i.check.name = "barriers_accessing_cooking_fuel",
-         i.check.current_value = barriers_accessing_cooking_fuel,
+         i.check.current_value = as.character(barriers_accessing_cooking_fuel),
          i.check.value = "",
          i.check.issue_id = "logic_issue_barriers_accessing_cooking_fuel_no",
          i.check.issue = glue("barriers_accessing_cooking_fuel: {barriers_accessing_cooking_fuel}, but cooking_fuel_access: {cooking_fuel_access}"),
@@ -233,7 +233,7 @@ df_access_to_electricity <- df_tool_data %>%
          time_walking_to_electricity_source == "less_than_30_minutes") %>%
   mutate(i.check.type = "change_response",
          i.check.name = "access_to_electricity",
-         i.check.current_value = access_to_electricity,
+         i.check.current_value = as.character(access_to_electricity),
          i.check.value = "",
          i.check.issue_id = "logic_issue_access_to_electricity_no",
          i.check.issue = glue("access_to_electricity: {access_to_electricity}, but 
@@ -259,7 +259,7 @@ df_hh_access_to_asset_ownership <- df_tool_data %>%
          hh_access_to_asset_ownership != "solar_panel") %>%
   mutate(i.check.type = "change_response",
          i.check.name = "access_to_electricity",
-         i.check.current_value = access_to_electricity,
+         i.check.current_value = as.character(access_to_electricity),
          i.check.value = "",
          i.check.issue_id = "logic_issue_access_to_electricity_yes_solar",
          i.check.issue = glue("access_to_electricity: {access_to_electricity}, but 
@@ -283,7 +283,7 @@ df_family_main_fd_source <- df_tool_data %>%
   filter(family_main_fd_source %in% c("humanitarian_assistance"), access_humanitarian_assistance == "no") %>%
   mutate(i.check.type = "change_response",
          i.check.name = "access_humanitarian_assistance",
-         i.check.current_value = access_humanitarian_assistance,
+         i.check.current_value = as.character(access_humanitarian_assistance),
          i.check.value = "",
          i.check.issue_id = "logic_issue_access_humanitarian_assistance_no",
          i.check.issue = glue("access_humanitarian_assistance: {access_humanitarian_assistance}, 
@@ -307,7 +307,7 @@ df_children_enrolled_in_school <- df_tool_data %>%
   filter(children_enrolled_in_school != school_aged_children ) %>%
   mutate(i.check.type = "change_response",
          i.check.name = "children_enrolled_in_school",
-         i.check.current_value = children_enrolled_in_school,
+         i.check.current_value = as.character(children_enrolled_in_school),
          i.check.value = "",
          i.check.issue_id = "logic_issue_children_enrolled_in_school_less",
          i.check.issue = glue("children_enrolled_in_school: {children_enrolled_in_school}, 
@@ -331,7 +331,7 @@ df_food_stock_category <- df_tool_data %>%
   filter(average_daily_fd_consumption %in% c("three_meals", "more_than_three_meals"), food_category == "none") %>%
   mutate(i.check.type = "change_response",
          i.check.name = "food_category",
-         i.check.current_value = food_category,
+         i.check.current_value = as.character(food_category),
          i.check.value = "",
          i.check.issue_id = "logic_issue_food_category_stock_none",
          i.check.issue = glue("food_category: {food_category}, 
