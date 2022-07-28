@@ -11,7 +11,7 @@ library(glue)
 df_tool_data <- readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Data.xlsx") %>% 
   mutate(i.check.uuid = `_uuid`,
          i.check.start_date = as_date(start),
-         i.check.enumerator_id = enumerator_id,
+         i.check.enumerator_id = as.character(enumerator_id),
          i.check.district_name = district_name,
          i.check.point_number = point_number,
          start = as_date(start),
@@ -124,7 +124,6 @@ df_educ_level_above_primary_but_cannot_count_money <- df_tool_data %>%
          i.check.comment = "FO to follow up with enumerator", 
          i.check.reviewed = "",
          i.check.adjust_log = "",
-         i.check.uuid_cl = "",
          i.check.so_sm_choices = "") %>% 
   dplyr::select(starts_with("i.check"))%>% 
   rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
@@ -148,7 +147,6 @@ df_money_usage <- df_tool_data %>%
          i.check.comment = "", 
          i.check.reviewed = "",
          i.check.adjust_log = "",
-         i.check.uuid_cl = "",
          i.check.so_sm_choices = "") %>%
   dplyr::select(starts_with("i.check.")) %>% 
   rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
@@ -173,7 +171,6 @@ df_average_daily_fd_consumption <- df_tool_data %>%
          i.check.comment = "", 
          i.check.reviewed = "",
          i.check.adjust_log = "",
-         i.check.uuid_cl = "",
          i.check.so_sm_choices = "") %>% 
   dplyr::select(starts_with("i.check.")) %>% 
   rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
@@ -198,7 +195,6 @@ df_food_amount_change <- df_tool_data %>%
          i.check.comment = "", 
          i.check.reviewed = "",
          i.check.adjust_log = "",
-         i.check.uuid_cl = "",
          i.check.so_sm_choices = "")%>% 
   dplyr::select(starts_with("i.check.")) %>% 
   rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
@@ -223,7 +219,6 @@ df_cooking_fuel_access <- df_tool_data %>%
          i.check.comment = "", 
          i.check.reviewed = "",
          i.check.adjust_log = "",
-         i.check.uuid_cl = "",
          i.check.so_sm_choices = "") %>% 
   dplyr::select(starts_with("i.check.")) %>% 
   rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
@@ -249,7 +244,6 @@ df_access_to_electricity <- df_tool_data %>%
          i.check.comment = "", 
          i.check.reviewed = "",
          i.check.adjust_log = "",
-         i.check.uuid_cl = "",
          i.check.so_sm_choices = "") %>%
   dplyr::select(starts_with("i.check.")) %>% 
   rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
@@ -276,7 +270,6 @@ df_hh_access_to_asset_ownership <- df_tool_data %>%
          i.check.comment = "", 
          i.check.reviewed = "",
          i.check.adjust_log = "",
-         i.check.uuid_cl = "",
          i.check.so_sm_choices = "") %>%
   dplyr::select(starts_with("i.check.")) %>% 
   rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
@@ -301,7 +294,6 @@ df_family_main_fd_source <- df_tool_data %>%
          i.check.comment = "", 
          i.check.reviewed = "",
          i.check.adjust_log = "",
-         i.check.uuid_cl = "",
          i.check.so_sm_choices = "") %>% 
   dplyr::select(starts_with("i.check.")) %>% 
   rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
@@ -326,7 +318,6 @@ df_children_enrolled_in_school <- df_tool_data %>%
          i.check.comment = "", 
          i.check.reviewed = "",
          i.check.adjust_log = "",
-         i.check.uuid_cl = "",
          i.check.so_sm_choices = "") %>% 
   dplyr::select(starts_with("i.check.")) %>% 
   rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
@@ -351,7 +342,6 @@ df_food_stock_category <- df_tool_data %>%
          i.check.comment = "", 
          i.check.reviewed = "",
          i.check.adjust_log = "",
-         i.check.uuid_cl = "",
          i.check.so_sm_choices = "") %>% 
   dplyr::select(starts_with("i.check.")) %>% 
   rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
