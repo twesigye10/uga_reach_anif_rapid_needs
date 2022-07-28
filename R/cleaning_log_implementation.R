@@ -54,7 +54,51 @@ kbo <- kobold::kobold(survey = df_survey,
 
 # modified choices for the survey tool ------------------------------------
 
+df_choises_modified <- butteR:::xlsform_add_choices(kobold = kbo, new_choices = new_vars)
+
+# special treat for variables for select_multiple, we need to add the columns to the data itself
+
+df_survey_sm <- df_survey %>% 
+  mutate(q_type = case_when(str_detect(string = type, pattern = "select_multiple|select multiple") ~ "sm",
+                            str_detect(string = type, pattern = "select_one|select one") ~ "so",
+                            TRUE ~ type)) %>% 
+  select(name, q_type)
+
+# construct new columns for select multiple
+
+new_vars_sm <- new_vars %>% 
+  left_join(df_survey_sm, by = "name") %>% 
+  filter(q_type == "sm") %>% 
+  mutate(new_cols = paste0(name,"/",choice))
 
 
+# add new columns to the raw data -----------------------------------------
 
+df_raw_data_modified <- df_raw_data %>% 
+  butteR:::mutate_batch(nm = new_vars_sm$new_cols, value = F )
+
+
+# make some clean up ------------------------------------------------------
+
+kbo_modified <- kobold::kobold(survey = df_survey %>% filter(name %in% colnames(df_raw_data_modified)), 
+                               choices = df_choises_modified, 
+                               data = df_raw_data_modified, 
+                               cleaning = df_cleaning_log )
+kbo_cleaned <- kobold::kobold_cleaner(kbo_modified)
   
+
+# handling added responses after starting data collection -----------------
+
+df_final_cleaned_data <- kbo_cleaned$data %>% 
+  mutate(across(.cols = contains("/"), .fns = ~ifelse(is.na(.), FALSE, .)))
+
+
+# write final modified data -----------------------------------------------
+
+write_csv(df_final_cleaned_data, file = paste0("outputs/", butteR::date_file_prefix(), "_clean_data.csv"))
+
+# output data with composite indicators
+
+df_with_composites <- create_composite_indicators_anif(input_df = df_final_cleaned_data)
+
+write_csv(df_with_composites, file = paste0("outputs/", butteR::date_file_prefix(), "_clean_data_with_composite_indicators.csv"))
