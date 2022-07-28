@@ -58,9 +58,17 @@ add_checks_data_to_list(input_list_name = "logic_output",input_df_name = "df_c_o
 
 # spatial checks ----------------------------------------------------------
 
-sample_pt_nos <- df_sample_data %>% 
-  pull(unique_pt_number) %>% 
-  unique()
+if("status" %in% colnames(df_sample_data)){
+  sample_pt_nos <- df_sample_data %>% 
+    mutate(unique_pt_number = paste0(status, "_", Name)) %>% 
+    pull(unique_pt_number) %>% 
+    unique()
+}else{
+  sample_pt_nos <- df_sample_data %>% 
+    mutate(unique_pt_number = Name) %>% 
+    pull(unique_pt_number) %>% 
+    unique()
+}
 
 # duplicate point numbers
 df_duplicate_pt_nos <- check_duplicate_pt_numbers(input_tool_data = df_tool_data, 
