@@ -51,8 +51,8 @@ df_tool_data <- readxl::read_excel("../inputs/ANIF_Rapid_Assessment_Data.xlsx") 
          latitude = as.numeric(`_geopoint_latitude`),
          longitude = as.numeric(`_geopoint_longitude`)) %>% 
   filter(consent_two == "yes",
-         start_date > as_date("2022-07-24"), 
-         # !str_detect(string = point_number, pattern = fixed('test', ignore_case = TRUE))
+         start_date > as_date("2022-07-27"), 
+         !str_detect(string = point_number, pattern = fixed('test', ignore_case = TRUE))
          )    
 
 # days that contain data
