@@ -242,43 +242,43 @@ df_cl_log %>%
   dt_options_fewcols()
 ```
 
-<!-- ### Map of surveys for deletion -->
+### Map of surveys for deletion
 
-<!-- ```{r, echo = FALSE, out.width="100%"} -->
-<!-- # popup -->
-<!-- labels_pts <- ~sprintf( -->
-<!--   "<strong>Settlement Name: %s</strong><br/> -->
-<!--       Point Number :  <strong>%s</strong><br/> -->
-<!--       Issue ID :  <strong>%s</strong><br/> -->
-<!--       Issue :  <strong>%s</strong><br/> -->
-<!--       Enumerator ID :  <strong>%s</strong>", -->
-<!--   refugee_settlement, point_number, issue_id, issue, enumerator_id -->
-<!-- ) %>%  -->
-<!--   lapply(htmltools::HTML) -->
+```{r, echo = FALSE, out.width="100%"}
+# popup
+labels_pts <- ~sprintf(
+  "<strong>Settlement Name: %s</strong><br/>
+      Point Number :  <strong>%s</strong><br/>
+      Issue ID :  <strong>%s</strong><br/>
+      Issue :  <strong>%s</strong><br/>
+      Enumerator ID :  <strong>%s</strong>",
+  refugee_settlement, point_number, issue_id, issue, enumerator_id
+) %>%
+  lapply(htmltools::HTML)
 
-<!-- df_cl_log %>%  -->
-<!--   filter(type == "remove_survey", reviewed == 1, adjust_log != "delete_log") %>%  -->
-<!--   group_by(uuid, refugee_settlement, latitude, longitude) %>%  -->
-<!--   summarise(start_date = paste(start_date, collapse = " : "), -->
-<!--             enumerator_id = paste(enumerator_id, collapse = " : "), -->
-<!--             district_name = paste(district_name, collapse = " : "), -->
-<!--             point_number = paste(point_number, collapse = " : "), -->
-<!--             type = paste(type, collapse = " : "), -->
-<!--             name = paste(name, collapse = " : "), -->
-<!--             current_value = paste(current_value, collapse = " : "), -->
-<!--             value = paste(value, collapse = " : "), -->
-<!--             issue_id = paste(issue_id, collapse = " : "), -->
-<!--             issue = paste(issue, collapse = " : ") -->
-<!--   ) %>%  -->
-<!--   unique() %>%  -->
-<!--   leaflet() %>%  -->
-<!--   addTiles() %>% -->
-<!--   addCircleMarkers(~longitude, -->
-<!--                    ~latitude, -->
-<!--                    popup = labels_pts, -->
-<!--                    radius = 10, -->
-<!--                    color = "red", -->
-<!--                    stroke = FALSE, fillOpacity = 0.9, -->
-<!--                    label = labels_pts, -->
-<!--                    clusterOptions = markerClusterOptions()) -->
-<!-- ``` -->
+df_cl_log %>%
+  filter(type == "remove_survey", reviewed == 1, adjust_log != "delete_log") %>%
+  group_by(uuid, refugee_settlement, latitude, longitude) %>%
+  summarise(start_date = paste(start_date, collapse = " : "),
+            enumerator_id = paste(enumerator_id, collapse = " : "),
+            district_name = paste(district_name, collapse = " : "),
+            point_number = paste(point_number, collapse = " : "),
+            type = paste(type, collapse = " : "),
+            name = paste(name, collapse = " : "),
+            current_value = paste(current_value, collapse = " : "),
+            value = paste(value, collapse = " : "),
+            issue_id = paste(issue_id, collapse = " : "),
+            issue = paste(issue, collapse = " : ")
+  ) %>%
+  unique() %>%
+  leaflet() %>%
+  addTiles() %>%
+  addCircleMarkers(~longitude,
+                   ~latitude,
+                   popup = labels_pts,
+                   radius = 10,
+                   color = "red",
+                   stroke = FALSE, fillOpacity = 0.9,
+                   label = labels_pts,
+                   clusterOptions = markerClusterOptions())
+```
