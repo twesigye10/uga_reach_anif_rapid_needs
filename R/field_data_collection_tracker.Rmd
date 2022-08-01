@@ -50,8 +50,8 @@ df_tool_data <- readxl::read_excel("../inputs/ANIF_Rapid_Assessment_Data.xlsx") 
          end = as_datetime(end),
          latitude = as.numeric(`_geopoint_latitude`),
          longitude = as.numeric(`_geopoint_longitude`)) %>% 
-  filter(consent_one == "yes",
-         start_date > as_date("2022-07-25"), 
+  filter(consent_two == "yes",
+         start_date > as_date("2022-07-27"), 
          !str_detect(string = point_number, pattern = fixed('test', ignore_case = TRUE))
          )    
 
@@ -61,7 +61,7 @@ df_days_for_data_collection <- df_tool_data %>% select(start_date) %>% unique() 
 df_data_support_cl_log <- df_tool_data %>% 
   select(uuid, refugee_settlement, latitude,	longitude )
 # cleaning log handling
-df_cl_log <- read_csv(file = "../inputs/20220727_combined_checks_anif.csv") %>% 
+df_cl_log <- read_csv(file = "../inputs/combined_checks_anif.csv") %>% 
   mutate(adjust_log = ifelse(is.na(adjust_log), "apply_suggested_change", adjust_log)) %>% 
   left_join(df_data_support_cl_log, by = "uuid")
 
@@ -113,7 +113,7 @@ dt_with_modified_options <- function(x){
   DT::datatable(x,
                 rownames = FALSE,
                 options = list(
-                  columnDefs = list(list(className = 'dt-center', targets = list(1,2,3,4,5))),
+                  # columnDefs = list(list(className = 'dt-center', targets = list(1,2,3,4,5))),
                   pageLength = 20,
                   initComplete = JS(
                     "function(settings, json) {",
@@ -162,10 +162,13 @@ dt_enum_performance_options <- function(x){
 
 ```{r, echo = FALSE}
 
-# df_refugee_samp_per_settlement <- df_sample_breakdown
+df_refugee_samp_per_settlement <- df_settlement_samples_required %>% 
+  group_by(refugee_settlement) %>% 
+  summarise(required_samples = sum(sample_size, na.rm = TRUE))
+
 
 df_cl_surveys_for_deletion <- df_cl_log %>%
-  filter(type == "remove_survey", reviewed == 1, adjust_log %in% c("delete_log")) %>%
+  filter(type == "remove_survey", reviewed == 1, !adjust_log %in% c("delete_log")) %>%
   group_by(refugee_settlement) %>%
   distinct(uuid) %>%
   summarise(surveys_for_deletion = n())
@@ -180,8 +183,9 @@ df_updated_tool_data %>%
   mutate(number_of_surveys = ifelse(is.na(number_of_surveys), 0, number_of_surveys),
          surveys_for_deletion = ifelse(is.na(surveys_for_deletion), 0, surveys_for_deletion),
          int.surveys_and_deletion = number_of_surveys - surveys_for_deletion,
-         remaining_surveys = sample_size - int.surveys_and_deletion ) %>%
-  select(-refugee_settlement) %>%
+         remaining_surveys = required_samples - int.surveys_and_deletion ) %>%
+  left_join(df_for_colnames, by = "refugee_settlement") %>% 
+  # select(-refugee_settlement) %>%
   rename(district_name = district_name.x) %>%
   mutate(district_name = district_name.y) %>%
   select(-c(int.surveys_and_deletion, district_name.y)) %>%
@@ -250,12 +254,12 @@ labels_pts <- ~sprintf(
       Issue :  <strong>%s</strong><br/>
       Enumerator ID :  <strong>%s</strong>",
   refugee_settlement, point_number, issue_id, issue, enumerator_id
-) %>% 
+) %>%
   lapply(htmltools::HTML)
 
-df_cl_log %>% 
-  filter(type == "remove_survey", reviewed == 1, adjust_log != "delete_log") %>% 
-  group_by(uuid, refugee_settlement, latitude, longitude) %>% 
+df_cl_log %>%
+  filter(type == "remove_survey", reviewed == 1, adjust_log != "delete_log") %>%
+  group_by(uuid, refugee_settlement, latitude, longitude) %>%
   summarise(start_date = paste(start_date, collapse = " : "),
             enumerator_id = paste(enumerator_id, collapse = " : "),
             district_name = paste(district_name, collapse = " : "),
@@ -266,9 +270,9 @@ df_cl_log %>%
             value = paste(value, collapse = " : "),
             issue_id = paste(issue_id, collapse = " : "),
             issue = paste(issue, collapse = " : ")
-  ) %>% 
-  unique() %>% 
-  leaflet() %>% 
+  ) %>%
+  unique() %>%
+  leaflet() %>%
   addTiles() %>%
   addCircleMarkers(~longitude,
                    ~latitude,

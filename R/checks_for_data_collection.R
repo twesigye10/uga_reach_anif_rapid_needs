@@ -13,9 +13,8 @@ df_tool_data <- readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Data.xls
          i.check.start_date = as_date(start),
          i.check.enumerator_id = as.character(enumerator_id),
          i.check.district_name = district_name,
-         i.check.point_number = point_number,
-         start = as_date(start),
-         end = as_datetime(end))
+         i.check.point_number = point_number) %>% 
+  filter(i.check.start_date > as_date("2022-07-27"))
 
 df_survey <- readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Tool.xlsx", sheet = "survey")
 df_choices <- readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Tool.xlsx", sheet = "choices")
@@ -86,7 +85,7 @@ add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_pt
 
 # check for exceeded threshold distance
 
-threshold_dist <- 150
+threshold_dist <- 300
 
 df_greater_thresh_distance <- check_threshold_distance(input_sample_data = df_sample_data, 
                                                        input_tool_data = df_tool_data, 
@@ -287,7 +286,7 @@ df_hh_access_to_asset_ownership <- df_tool_data %>%
          i.check.name = "access_to_electricity",
          i.check.current_value = as.character(access_to_electricity),
          i.check.value = "",
-         i.check.issue_id = "hh_access_to_asset_ownership_solar",
+         i.check.issue_id = "logic_c_access_to_electricity_yes_solar",
          i.check.issue = glue("hh_access_to_asset_ownership: {hh_access_to_asset_ownership}, but 
                               access_to_electricity: {access_to_electricity}"),
          i.check.other_text = "",
