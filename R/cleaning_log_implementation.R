@@ -7,7 +7,7 @@ library(glue)
 
 # read data
 
-df_cleaning_log <- read_csv("inputs/20220727_combined_checks_anif.csv") %>% 
+df_cleaning_log <- read_csv("inputs/combined_checks_anif.csv") %>% 
   mutate(adjust_log = ifelse(is.na(adjust_log), "apply_suggested_change", adjust_log)) %>%
   filter(adjust_log != "delete_log", !is.na(value), !is.na(uuid)) %>% 
   mutate(sheet = NA, index = NA, relevant = NA) %>% 
