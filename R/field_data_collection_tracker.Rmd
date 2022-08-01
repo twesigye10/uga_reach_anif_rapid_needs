@@ -61,7 +61,7 @@ df_days_for_data_collection <- df_tool_data %>% select(start_date) %>% unique() 
 df_data_support_cl_log <- df_tool_data %>% 
   select(uuid, refugee_settlement, latitude,	longitude )
 # cleaning log handling
-df_cl_log <- read_csv(file = "../inputs/20220727_combined_checks_anif.csv") %>% 
+df_cl_log <- read_csv(file = "../inputs/combined_checks_anif.csv") %>% 
   mutate(adjust_log = ifelse(is.na(adjust_log), "apply_suggested_change", adjust_log)) %>% 
   left_join(df_data_support_cl_log, by = "uuid")
 
