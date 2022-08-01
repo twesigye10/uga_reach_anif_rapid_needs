@@ -128,7 +128,7 @@ df_educ_level_above_primary_but_cannot_count_money <- df_tool_data %>%
   rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
 
 add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_educ_level_above_primary_but_cannot_count_money")    
-    
+
 
 # If completed primary and above but can not allocate money to priorities i.e. "do you......" is "none", check
 df_money_usage <- df_tool_data %>% 
@@ -250,17 +250,17 @@ df_access_to_electricity <- df_tool_data %>%
 add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_access_to_electricity")
 
 
-# If hh currently accesses electricity throuh solar i.e. access_to_electricity = "yes_we_have_a_solar_panel" and  
-# asset hh owns there is no solar i.e hh_access_to_asset_ownership != "solar_panel", check
+# If hh currently accesses electricity throuh solar i.e. access_to_electricity = "yes_we_have_a_solar_panel" but   
+# among assets hh owns there is no solar i.e hh_access_to_asset_ownership != "solar_panel", check
 
-df_hh_access_to_asset_ownership <- df_tool_data %>% 
-  filter(access_to_electricity %in% c("yes_we_have_a_solar_panel"), 
-         hh_access_to_asset_ownership != "solar_panel") %>%
-  mutate(i.check.type = "change_response",
-         i.check.name = "access_to_electricity",
-         i.check.current_value = as.character(access_to_electricity),
+df_access_to_electricity_solar <- df_tool_data %>% 
+  filter(access_to_electricity == "yes_we_have_a_solar_panel", !str_detect(string = hh_access_to_asset_ownership, 
+                                                                           pattern = "solar_panel")) %>%
+  mutate(i.check.type = "add_option",
+         i.check.name = "hh_access_to_asset_ownership",
+         i.check.current_value = as.character(hh_access_to_asset_ownership),
          i.check.value = "",
-         i.check.issue_id = "logic_c_access_to_electricity_yes_solar",
+         i.check.issue_id = "logic_c_hh_access_to_asset_ownership_solar",
          i.check.issue = glue("access_to_electricity: {access_to_electricity}, but 
                               hh_access_to_asset_ownership: {hh_access_to_asset_ownership}"),
          i.check.other_text = "",
@@ -273,7 +273,34 @@ df_hh_access_to_asset_ownership <- df_tool_data %>%
   dplyr::select(starts_with("i.check.")) %>% 
   rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
 
+add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_access_to_electricity_solar")
+
+
+# If among assets hh owns there is solar i.e hh_access_to_asset_ownership = "solar_panel" but hh currently accesses 
+# electricity has no solar i.e. access_to_electricity != "yes_we_have_a_solar_panel", check
+
+df_hh_access_to_asset_ownership <- df_tool_data %>% 
+  filter(hh_access_to_asset_ownership %in% c("solar_panel"), 
+         access_to_electricity != "yes_we_have_a_solar_panel") %>%
+  mutate(i.check.type = "change_response",
+         i.check.name = "access_to_electricity",
+         i.check.current_value = as.character(access_to_electricity),
+         i.check.value = "",
+         i.check.issue_id = "logic_c_access_to_electricity_yes_solar",
+         i.check.issue = glue("hh_access_to_asset_ownership: {hh_access_to_asset_ownership}, but 
+                              access_to_electricity: {access_to_electricity}"),
+         i.check.other_text = "",
+         i.check.checked_by = "",
+         i.check.checked_date = as_date(today()),
+         i.check.comment = "", 
+         i.check.reviewed = "",
+         i.check.adjust_log = "",
+         i.check.so_sm_choices = "") %>%
+  dplyr::select(starts_with("i.check.")) %>% 
+  rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
+
 add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_hh_access_to_asset_ownership")
+
 
 
 # If hh main source of food is i.e. family_main_fd_source = "humanitarian_assistance" but hh has never received humanitarian assistance i.e.
@@ -348,17 +375,12 @@ df_food_stock_category <- df_tool_data %>%
 add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_food_stock_category")
 
 
-
-
-
-
-
 df_combined_checks <- bind_rows(logic_output)
-    
+
 # output the resulting data frame
 write_csv(x = df_combined_checks, file = paste0("outputs/", butteR::date_file_prefix(), "_combined_checks_anif.csv"), na = "")
 
-    
+
   
   
   
