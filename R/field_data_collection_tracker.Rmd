@@ -168,7 +168,7 @@ df_refugee_samp_per_settlement <- df_settlement_samples_required %>%
 
 
 df_cl_surveys_for_deletion <- df_cl_log %>%
-  filter(type == "remove_survey", reviewed == 1, adjust_log %in% c("delete_log")) %>%
+  filter(type == "remove_survey", reviewed == 1, !adjust_log %in% c("delete_log")) %>%
   group_by(refugee_settlement) %>%
   distinct(uuid) %>%
   summarise(surveys_for_deletion = n())
