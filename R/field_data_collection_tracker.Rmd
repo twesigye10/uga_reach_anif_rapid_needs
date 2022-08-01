@@ -184,7 +184,8 @@ df_updated_tool_data %>%
          surveys_for_deletion = ifelse(is.na(surveys_for_deletion), 0, surveys_for_deletion),
          int.surveys_and_deletion = number_of_surveys - surveys_for_deletion,
          remaining_surveys = required_samples - int.surveys_and_deletion ) %>%
-  select(-refugee_settlement) %>%
+  left_join(df_for_colnames, by = "refugee_settlement") %>% 
+  # select(-refugee_settlement) %>%
   rename(district_name = district_name.x) %>%
   mutate(district_name = district_name.y) %>%
   select(-c(int.surveys_and_deletion, district_name.y)) %>%
