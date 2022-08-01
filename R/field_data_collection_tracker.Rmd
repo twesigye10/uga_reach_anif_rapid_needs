@@ -113,7 +113,7 @@ dt_with_modified_options <- function(x){
   DT::datatable(x,
                 rownames = FALSE,
                 options = list(
-                  columnDefs = list(list(className = 'dt-center', targets = list(1,2,3,4,5))),
+                  # columnDefs = list(list(className = 'dt-center', targets = list(1,2,3,4,5))),
                   pageLength = 20,
                   initComplete = JS(
                     "function(settings, json) {",
