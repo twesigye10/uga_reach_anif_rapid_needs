@@ -7,16 +7,16 @@ library(glue)
 
 # read data
 
-df_cleaning_log <- read_csv("inputs/20220727_combined_checks_anif.csv") %>% 
+df_cleaning_log <- read_csv("inputs/combined_checks_anif.csv") %>% 
   mutate(adjust_log = ifelse(is.na(adjust_log), "apply_suggested_change", adjust_log)) %>%
   filter(adjust_log != "delete_log", !is.na(value), !is.na(uuid)) %>% 
   mutate(sheet = NA, index = NA, relevant = NA) %>% 
   select(uuid, type, name, value, issue_id, sheet, index, relevant, issue)
 
-data_nms <- names(readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Tool.xlsx", n_max = 0))
+data_nms <- names(readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Data.xlsx", n_max = 100))
 c_types <- ifelse(str_detect(string = data_nms, pattern = "_other$"), "text", "guess")
 
-df_raw_data <- readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Data.xlsx", sheet = "inputs/ANIF_Rapid_Assessment_Tool.xlsx", col_types = c_types) %>% 
+df_raw_data <- readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Data.xlsx", col_types = c_types) %>% 
   mutate(across(.cols = everything(), .fns = ~ifelse(str_detect(string = ., pattern = fixed(pattern = "N/A", ignore_case = TRUE)), "NA", .)))
 
 df_survey <- readxl::read_excel("inputs/ANIF_Rapid_Assessment_Tool.xlsx", sheet = "survey")
@@ -32,6 +32,7 @@ df_grouped_choices<- df_choices %>%
   summarise(choice_options = paste(name, collapse = " : "))
 
 # get new name and ad_option pairs to add to the choices sheet
+new_vars <- df_cleaning_log %>% 
 filter(type %in% c("change_response", "add_option")) %>% 
   left_join(df_survey, by = "name") %>% 
   filter(str_detect(string = type.y, pattern = "select_one|select one|select_multiple|select multiple")) %>% 
