@@ -213,6 +213,7 @@ df_enum_performance %>%
 df_cl_log %>% 
   group_by(issue_id) %>% 
   summarise(number_of_issues_by_issue_id = n()) %>%
+  arrange(desc(number_of_issues_by_issue_id)) %>% 
   dt_options_fewcols()
 ```
 ### Number of issues by enumerator
@@ -221,6 +222,7 @@ df_cl_log %>%
 df_cl_log %>% 
   group_by(enumerator_id) %>% 
   summarise(number_of_issues_by_enumerator_id = n()) %>%
+  arrange(desc(number_of_issues_by_enumerator_id)) %>% 
   dt_options_fewcols()
 ```
 
@@ -230,6 +232,7 @@ df_cl_log %>%
 df_cl_log %>% 
   group_by(enumerator_id, issue_id) %>% 
   summarise(number_of_issues_by_enumerator_and_issue_id = n()) %>%
+  arrange(desc(number_of_issues_by_enumerator_and_issue_id)) %>% 
   dt_options_fewcols()
 ```
 
@@ -240,6 +243,7 @@ df_cl_log %>%
   filter(type == "remove_survey", reviewed == 1, adjust_log != "delete_log") %>% 
   group_by(enumerator_id) %>% 
   summarise(number_of_surveys_for_deletion_by_enumerator = n()) %>%
+  arrange(desc(number_of_surveys_for_deletion_by_enumerator)) %>% 
   dt_options_fewcols()
 ```
 
