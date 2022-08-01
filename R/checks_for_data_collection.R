@@ -13,9 +13,7 @@ df_tool_data <- readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Data.xls
          i.check.start_date = as_date(start),
          i.check.enumerator_id = as.character(enumerator_id),
          i.check.district_name = district_name,
-         i.check.point_number = point_number,
-         start = as_date(start),
-         end = as_datetime(end)) %>% 
+         i.check.point_number = point_number) %>% 
   filter(i.check.start_date > as_date("2022-07-27"))
 
 df_survey <- readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Tool.xlsx", sheet = "survey")
