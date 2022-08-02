@@ -17,7 +17,10 @@ data_nms <- names(readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Data.x
 c_types <- ifelse(str_detect(string = data_nms, pattern = "_other$"), "text", "guess")
 
 df_raw_data <- readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Data.xlsx", col_types = c_types) %>% 
-  mutate(across(.cols = everything(), .fns = ~ifelse(str_detect(string = ., pattern = fixed(pattern = "N/A", ignore_case = TRUE)), "NA", .)))
+  mutate(across(.cols = everything(), .fns = ~ifelse(str_detect(string = ., 
+                                                                pattern = fixed(pattern = "N/A", ignore_case = TRUE)), 
+                                                     "NA", .))) %>% 
+  filter(as_date(as_datetime(start)) > as_date("2022-07-27"))
 
 df_survey <- readxl::read_excel("inputs/ANIF_Rapid_Assessment_Tool.xlsx", sheet = "survey")
 df_choices <- readxl::read_excel("inputs/ANIF_Rapid_Assessment_Tool.xlsx", sheet = "choices")
@@ -88,18 +91,52 @@ kbo_modified <- kobold::kobold(survey = df_survey %>% filter(name %in% colnames(
 kbo_cleaned <- kobold::kobold_cleaner(kbo_modified)
   
 
-# handling added responses after starting data collection -----------------
+# handling Personally Identifiable Information(PII)
+input_vars_to_remove_from_data <- c("deviceid", 
+                                    "audit",
+                                    "audit_URL",
+                                    "instance_name",
+                                    "complainant_name",
+                                    "complainant_id",
+                                    "respondent_telephone",
+                                    "name_pers_recording",
+                                    "geopoint",
+                                    "_geopoint_latitude",
+                                    "_geopoint_longitude",
+                                    "_geopoint_altitude",
+                                    "_geopoint_precision")
 
-df_final_cleaned_data <- kbo_cleaned$data %>% 
-  mutate(across(.cols = contains("/"), .fns = ~ifelse(is.na(.), FALSE, .)))
+df_handle_pii <- kbo_cleaned$data %>% 
+  mutate(across(any_of(input_vars_to_remove_from_data), .fns = ~na_if(., .)))
+
+# handling added responses after starting data collection and added responses in the cleaning process
+
+sm_colnames <-  df_handle_pii %>% 
+  select(contains("/")) %>% 
+  colnames() %>% 
+  str_replace_all(pattern = "/.+", replacement = "") %>% 
+  unique()
+
+df_handle_sm_data <- df_handle_pii
+
+for (cur_sm_col in sm_colnames) {
+  df_updated_data <- df_handle_sm_data %>% 
+    mutate(
+      across(contains(paste0(cur_sm_col, "/")), .fns = ~ifelse(!is.na(!!sym(cur_sm_col)) & is.na(.) , FALSE, .)),
+      across(contains(paste0(cur_sm_col, "/")), .fns = ~ifelse(is.na(!!sym(cur_sm_col)), NA, .))
+    )
+  df_handle_sm_data <- df_updated_data
+}
+
+df_final_cleaned_data <- df_handle_sm_data
 
 
 # write final modified data -----------------------------------------------
 
-write_csv(df_final_cleaned_data, file = paste0("outputs/", butteR::date_file_prefix(), "_clean_data.csv"))
+write_csv(df_final_cleaned_data, file = paste0("outputs/", butteR::date_file_prefix(), "_clean_data_anif.csv"))
 
 # output data with composite indicators
 
-df_with_composites <- create_composite_indicators_anif(input_df = df_final_cleaned_data)
+# df_with_composites <- create_composite_indicators_anif(input_df = df_final_cleaned_data)
 
-write_csv(df_with_composites, file = paste0("outputs/", butteR::date_file_prefix(), "_clean_data_with_composite_indicators.csv"))
+# write_csv(df_with_composites, file = paste0("outputs/", butteR::date_file_prefix(), "_clean_data_with_composite_indicators.csv"))
