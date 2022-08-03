@@ -12,7 +12,7 @@ create_composite_indicators_anif <- function(input_df) {
                                               respondent_education %in% c("none") ~ "None",
                                               TRUE ~ "Other"
            ),
-           
+           date_arrival = ifelse(uganda_visit_frequency == "no", as_date(as_datetime(last_date_arrival)), date_arrival),
            int.date_arrival_interval = interval(as_date(date_arrival), as_date(as_datetime(today))),
            int.length_since_date_arrival = time_length(int.date_arrival_interval, "year"),
            i.date_arrival = case_when(int.length_since_date_arrival <= 0.25 ~ "last_3_months",
