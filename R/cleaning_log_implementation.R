@@ -4,6 +4,7 @@ library(tidyverse)
 library(lubridate)
 library(glue)
 
+source("R/composite_indicators.R")
 
 # read data
 
@@ -135,9 +136,10 @@ df_final_cleaned_data <- df_handle_sm_data
 # write final modified data -----------------------------------------------
 
 write_csv(df_final_cleaned_data, file = paste0("outputs/", butteR::date_file_prefix(), "_clean_data_anif.csv"))
+write_csv(df_final_cleaned_data, file = paste0("inputs/clean_data_anif.csv"))
 
 # output data with composite indicators
 
-# df_with_composites <- create_composite_indicators_anif(input_df = df_final_cleaned_data)
+df_with_composites <- create_composite_indicators_anif(input_df = df_final_cleaned_data)
 
-# write_csv(df_with_composites, file = paste0("outputs/", butteR::date_file_prefix(), "_clean_data_with_composite_indicators.csv"))
+write_csv(df_with_composites, file = paste0("outputs/", butteR::date_file_prefix(), "_clean_data_with_composite_indicators.csv"))
