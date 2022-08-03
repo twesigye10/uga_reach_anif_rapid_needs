@@ -13,8 +13,8 @@ source("R/make_weights.R")
 df_cleaned <- read_csv("inputs/clean_data_anif.csv")
 
 dap <- read_csv("inputs/r_dap_anif.csv") %>% 
-  janitor::clean_names() %>% 
-  filter(!variable %in% c("i.date_arrival"), !subset_1 %in% c("i.date_arrival"))
+  janitor::clean_names() # %>% 
+  # filter(!variable %in% c("i.date_arrival"), !subset_1 %in% c("i.date_arrival"))
 
 start<- Sys.time() 
 
