@@ -17,10 +17,11 @@ data_nms <- names(readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Data.x
 c_types <- ifelse(str_detect(string = data_nms, pattern = "_other$"), "text", "guess")
 
 df_raw_data <- readxl::read_excel(path = "inputs/ANIF_Rapid_Assessment_Data.xlsx", col_types = c_types) %>% 
+  filter(as_date(as_datetime(start)) > as_date("2022-07-27")) %>%
   mutate(across(.cols = everything(), .fns = ~ifelse(str_detect(string = ., 
                                                                 pattern = fixed(pattern = "N/A", ignore_case = TRUE)), 
                                                      "NA", .))) %>% 
-  filter(as_date(as_datetime(start)) > as_date("2022-07-27"))
+  mutate(start = as_datetime(start), end = as_datetime(end), today = as_date(as_datetime(today)), date_arrival = as_date(as_datetime(date_arrival)))
 
 df_survey <- readxl::read_excel("inputs/ANIF_Rapid_Assessment_Tool.xlsx", sheet = "survey")
 df_choices <- readxl::read_excel("inputs/ANIF_Rapid_Assessment_Tool.xlsx", sheet = "choices")
