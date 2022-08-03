@@ -10,25 +10,29 @@ source("R/make_weights.R")
 
 # load data ---------------------------------------------------------------
 
-df_cleaned <- read_csv("outputs/clean_data_anif.csv")
+df_cleaned <- read_csv("inputs/clean_data_anif.csv")
 
-dap <- read_csv("outputs/r_dap.csv") %>% 
+dap <- read_csv("inputs/r_dap_anif.csv") %>% 
   janitor::clean_names()
 
 start<- Sys.time() 
 
 # load in individual level population data sets
-df_ref_pop <- read_csv("inputs/refugee_population.csv")
+df_ref_pop <- read_csv("inputs/refugee_population_anif.csv")
 
 
 # make composite indicator ------------------------------------------------
 
 df_with_composites <- create_composite_indicators_anif(input_df = df_cleaned) %>% 
-  mutate(strata = case_when(status == "refugee" ~ paste0(i.refugee_settlement, "_refugee"),
-                            TRUE ~ status
-  ))
+  mutate(strata = paste0(refugee_settlement, "_refugee"))
 
 # create weights
+
+# refugee weights
+ref_weight_table <- make_refugee_weight_table(input_df_ref = df_with_composites, 
+                                              input_refugee_pop = df_ref_pop)
+df_ref_with_weights <- df_with_composites %>% 
+  left_join(ref_weight_table, by = "strata")
 
 # set up design objects ---------------------------------------------------
 
