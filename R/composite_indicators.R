@@ -13,7 +13,7 @@ create_composite_indicators_anif <- function(input_df) {
                                               TRUE ~ "Other"
            ),
            
-           int.date_arrival_interval = interval(as_date(as_datetime(date_arrival)), as_date(today)),
+           int.date_arrival_interval = interval(as_date(date_arrival), as_date(as_datetime(today))),
            int.length_since_date_arrival = time_length(int.date_arrival_interval, "year"),
            i.date_arrival = case_when(int.length_since_date_arrival <= 0.25 ~ "last_3_months",
                                       int.length_since_date_arrival <= 1 ~ "more_than_3_months",
