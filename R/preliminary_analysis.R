@@ -2,8 +2,11 @@ library(tidyverse)
 library(srvyr)
 library(janitor)
 library(glue)
+library(lubridate)
 
-
+# source some scripts
+source("R/composite_indicators.R")
+source("R/make_weights.R")
 
 # load data ---------------------------------------------------------------
 
@@ -25,13 +28,89 @@ df_with_composites <- create_composite_indicators_anif(input_df = df_cleaned) %>
                             TRUE ~ status
   ))
 
+# create weights
+
+# set up design objects ---------------------------------------------------
+
+ref_svy <- as_survey(.data = df_ref_with_weights, strata = strata, weights = weights )
+
+
 # different analyses ---------------------------------------
 outputs <-list()
 
 
+# refugee -----------------------------------------------------------------
 
+dap_refugee <- dap %>% 
+  filter(split %in% c("all", "refugee_only"))
 
+# no subsets
 
+refugee_variables_no_subsets <- dap_refugee %>% 
+  pull(variable) %>% unique()
 
+outputs$ref_region <- butteR::survey_collapse(df = ref_svy,
+                                              vars_to_analyze = refugee_variables_no_subsets, 
+                                              disag = "i.region") %>% 
+  mutate(population = "refugee")
+
+# write_csv(x = outputs$ref_region, file = paste0("outputs/", butteR::date_file_prefix(), "_ref_region_analysis_long_format.csv"),na="")
+
+# refugee overall, no additional subset
+outputs$ref_overall <- butteR::survey_collapse(df = ref_svy,
+                                               vars_to_analyze = refugee_variables_no_subsets) %>% 
+  mutate(population = "refugee")
+# write_csv(x = outputs$ref_overall, file = paste0("outputs/", butteR::date_file_prefix(), "_ref_overall_analysis_long_format.csv"),na="")
+
+#  subsets
+dap_refugee_subset1 <- dap %>% 
+  filter( split %in%  c("all","refugee_only"), !is.na(subset_1))
+
+# refugee overall, subset 1
+dap_refugee_subset_split <- dap_refugee_subset1 %>% 
+  split(.$subset_1)
+
+ref_overall_subset1 <-list()
+
+for(i in seq_along(dap_refugee_subset_split)){ 
+  print(i)
+  subset_temp <- dap_refugee_subset_split[[i]]
+  subset_value <- unique(subset_temp$subset_1)
+  vars_temp <- subset_temp %>% pull(variable)
+  ref_overall_subset1[[subset_value]] <- butteR::survey_collapse(df = ref_svy,
+                                                                 vars_to_analyze = vars_temp ,
+                                                                 disag = c( subset_value) 
+  )
+}
+
+outputs$ref_overall_subset1 <- bind_rows(ref_overall_subset1) %>% 
+  mutate(population = "refugee")
+# write_csv(x = outputs$ref_overall_subset1, file = paste0("outputs/", butteR::date_file_prefix(), "_ref_overall_subset1_analysis_long_format.csv"),na="")
+
+# refugee overall by region & subset 1
+ref_region_subset1 <- list()
+
+for(i in seq_along(dap_refugee_subset_split)){ 
+  print(i)
+  subset_temp <-dap_refugee_subset_split[[i]]
+  subset_value <- unique(subset_temp$subset_1)
+  vars_temp <- subset_temp %>% pull(variable)
+  ref_region_subset1[[subset_value]] <- butteR::survey_collapse(df = ref_svy,
+                                                                vars_to_analyze = vars_temp ,
+                                                                disag = c( "i.region", subset_value) 
+  )
+}
+outputs$ref_region_subset1 <- bind_rows(ref_region_subset1) %>% 
+  mutate(population = "refugee")
+# write_csv(x = outputs$ref_region_subset1, file = paste0("outputs/", butteR::date_file_prefix(), "_ref_region_subset1_analysis_long_format.csv"),na="")
+
+# merge analysis ----------------------------------------------------------
+
+full_analysis_long <- bind_rows(outputs)
+end<- Sys.time()
+end-start
+
+full_analysis_long %>%
+  write_csv(paste0("outputs/", butteR::date_file_prefix(), "_full_analysis_long_format.csv"),na="")
 
 
