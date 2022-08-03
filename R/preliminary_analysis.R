@@ -13,7 +13,8 @@ source("R/make_weights.R")
 df_cleaned <- read_csv("inputs/clean_data_anif.csv")
 
 dap <- read_csv("inputs/r_dap_anif.csv") %>% 
-  janitor::clean_names()
+  janitor::clean_names() %>% 
+  filter(!variable %in% c("i.date_arrival"), !subset_1 %in% c("i.date_arrival"))
 
 start<- Sys.time() 
 
@@ -58,13 +59,10 @@ outputs$ref_region <- butteR::survey_collapse(df = ref_svy,
                                               disag = "i.region") %>% 
   mutate(population = "refugee")
 
-# write_csv(x = outputs$ref_region, file = paste0("outputs/", butteR::date_file_prefix(), "_ref_region_analysis_long_format.csv"),na="")
-
 # refugee overall, no additional subset
 outputs$ref_overall <- butteR::survey_collapse(df = ref_svy,
                                                vars_to_analyze = refugee_variables_no_subsets) %>% 
   mutate(population = "refugee")
-# write_csv(x = outputs$ref_overall, file = paste0("outputs/", butteR::date_file_prefix(), "_ref_overall_analysis_long_format.csv"),na="")
 
 #  subsets
 dap_refugee_subset1 <- dap %>% 
@@ -89,7 +87,6 @@ for(i in seq_along(dap_refugee_subset_split)){
 
 outputs$ref_overall_subset1 <- bind_rows(ref_overall_subset1) %>% 
   mutate(population = "refugee")
-# write_csv(x = outputs$ref_overall_subset1, file = paste0("outputs/", butteR::date_file_prefix(), "_ref_overall_subset1_analysis_long_format.csv"),na="")
 
 # refugee overall by region & subset 1
 ref_region_subset1 <- list()
@@ -106,7 +103,6 @@ for(i in seq_along(dap_refugee_subset_split)){
 }
 outputs$ref_region_subset1 <- bind_rows(ref_region_subset1) %>% 
   mutate(population = "refugee")
-# write_csv(x = outputs$ref_region_subset1, file = paste0("outputs/", butteR::date_file_prefix(), "_ref_region_subset1_analysis_long_format.csv"),na="")
 
 # merge analysis ----------------------------------------------------------
 
@@ -115,6 +111,6 @@ end<- Sys.time()
 end-start
 
 full_analysis_long %>%
-  write_csv(paste0("outputs/", butteR::date_file_prefix(), "_full_analysis_long_format.csv"),na="")
+  write_csv(paste0("outputs/", butteR::date_file_prefix(), "_full_analysis_lf.csv"),na="")
 
 
