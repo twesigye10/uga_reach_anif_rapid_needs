@@ -309,14 +309,14 @@ add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_hh
 
 
 
-# If hh main source of food is i.e. family_main_fd_source = "humanitarian_assistance" but hh has never received humanitarian assistance i.e.
-# access_humanitarian_assistance = "no", check
+# hh main source of food is i.e. family_main_fd_source = "humanitarian_assistance" but hh has never received humanitarian assistance i.e.
+# access_humanitarian_assistance = "no"
 df_family_main_fd_source <- df_tool_data %>% 
   filter(family_main_fd_source %in% c("humanitarian_assistance"), access_humanitarian_assistance == "no") %>%
   mutate(i.check.type = "change_response",
          i.check.name = "access_humanitarian_assistance",
-         i.check.current_value = as.character(access_humanitarian_assistance),
-         i.check.value = "",
+         i.check.current_value = access_humanitarian_assistance,
+         i.check.value = "yes",
          i.check.issue_id = "logic_c_access_humanitarian_assistance_no",
          i.check.issue = glue("access_humanitarian_assistance: {access_humanitarian_assistance}, 
                               but family_main_fd_source: {family_main_fd_source}"),
@@ -342,8 +342,7 @@ df_children_enrolled_in_school <- df_tool_data %>%
          i.check.current_value = as.character(children_enrolled_in_school),
          i.check.value = "",
          i.check.issue_id = "logic_c_children_enrolled_in_school_less",
-         i.check.issue = glue("children_enrolled_in_school: {children_enrolled_in_school}, 
-                              but school_aged_children: {school_aged_children}"),
+         i.check.issue = glue("children_enrolled_in_school: {children_enrolled_in_school}, but school_aged_children: {school_aged_children}"),
          i.check.other_text = "",
          i.check.checked_by = "",
          i.check.checked_date = as_date(today()),
