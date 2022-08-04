@@ -257,15 +257,15 @@ add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_ac
 
 
 # If hh currently accesses electricity throuh solar i.e. access_to_electricity = "yes_we_have_a_solar_panel" but   
-# among assets hh owns there is no solar i.e hh_access_to_asset_ownership != "solar_panel", check
+# among assets hh owns there is no solar i.e hh_access_to_asset_ownership != "solar_panel"
 
 df_access_to_electricity_solar <- df_tool_data %>% 
-  filter(access_to_electricity == "yes_we_have_a_solar_panel", !str_detect(string = hh_access_to_asset_ownership, 
-                                                                           pattern = "solar_panel")) %>%
+  filter(access_to_electricity == "yes_we_have_a_solar_panel", 
+         !str_detect(string = hh_access_to_asset_ownership, pattern = "solar_panel")) %>%
   mutate(i.check.type = "add_option",
          i.check.name = "hh_access_to_asset_ownership",
-         i.check.current_value = as.character(hh_access_to_asset_ownership),
-         i.check.value = "",
+         i.check.current_value = hh_access_to_asset_ownership,
+         i.check.value = "solar_panel",
          i.check.issue_id = "logic_c_hh_access_to_asset_ownership_solar",
          i.check.issue = glue("access_to_electricity: {access_to_electricity}, but 
                               hh_access_to_asset_ownership: {hh_access_to_asset_ownership}"),
@@ -286,12 +286,12 @@ add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_ac
 # electricity has no solar i.e. access_to_electricity != "yes_we_have_a_solar_panel", check
 
 df_hh_access_to_asset_ownership <- df_tool_data %>% 
-  filter(hh_access_to_asset_ownership %in% c("solar_panel"), 
+  filter(str_detect(string = hh_access_to_asset_ownership, pattern = "solar_panel"), 
          access_to_electricity != "yes_we_have_a_solar_panel") %>%
   mutate(i.check.type = "change_response",
          i.check.name = "access_to_electricity",
          i.check.current_value = as.character(access_to_electricity),
-         i.check.value = "",
+         i.check.value = "yes_we_have_a_solar_panel",
          i.check.issue_id = "logic_c_access_to_electricity_yes_solar",
          i.check.issue = glue("hh_access_to_asset_ownership: {hh_access_to_asset_ownership}, but 
                               access_to_electricity: {access_to_electricity}"),
@@ -306,7 +306,6 @@ df_hh_access_to_asset_ownership <- df_tool_data %>%
   rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
 
 add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_hh_access_to_asset_ownership")
-
 
 
 # hh main source of food is i.e. family_main_fd_source = "humanitarian_assistance" but hh has never received humanitarian assistance i.e.
