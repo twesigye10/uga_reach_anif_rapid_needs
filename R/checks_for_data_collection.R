@@ -290,7 +290,7 @@ df_hh_access_to_asset_ownership <- df_tool_data %>%
          access_to_electricity != "yes_we_have_a_solar_panel") %>%
   mutate(i.check.type = "change_response",
          i.check.name = "access_to_electricity",
-         i.check.current_value = as.character(access_to_electricity),
+         i.check.current_value = access_to_electricity,
          i.check.value = "yes_we_have_a_solar_panel",
          i.check.issue_id = "logic_c_access_to_electricity_yes_solar",
          i.check.issue = glue("hh_access_to_asset_ownership: {hh_access_to_asset_ownership}, but 
