@@ -186,7 +186,7 @@ add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_av
 # average meals eaten a day i.e average_daily_fd_consumption = "less_than_two_meals" and 
 # food_amount_change = "we_are_now_eating_more_than_we_were_in_our_home_country"
 df_food_amount_change <- df_tool_data %>% 
-  filter(food_amount_change %in% c("we_are_now_eating_more_than_we_were_in_our_home_country") , 
+  filter(str_detect(string = food_amount_change, pattern = "we_are_now_eating_more_than_we_were_in_our_home_country") , 
          average_daily_fd_consumption == "less_than_two_meals") %>%
   mutate(i.check.type = "change_response",
          i.check.name = "average_daily_fd_consumption",
@@ -210,11 +210,11 @@ add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_fo
 # If hh currently has no access to cooking fuel i.e. cooking_fuel_access = "no" and 
 # barriers_accessing_cooking_fuel = "we_do_not_face_any_barriers_to_accessing_fuel_for_cooking", check
 df_cooking_fuel_access <- df_tool_data %>% 
-  filter(barriers_accessing_cooking_fuel %in% c("we_do_not_face_any_barriers_to_accessing_fuel_for_cooking"), 
+  filter( barriers_accessing_cooking_fuel %in% c("we_do_not_face_any_barriers_to_accessing_fuel_for_cooking"), 
          cooking_fuel_access == "no") %>%
   mutate(i.check.type = "remove_option",
          i.check.name = "barriers_accessing_cooking_fuel",
-         i.check.current_value = as.character(barriers_accessing_cooking_fuel),
+         i.check.current_value = barriers_accessing_cooking_fuel,
          i.check.value = "",
          i.check.issue_id = "logic_c_barriers_accessing_cooking_fuel_no",
          i.check.issue = glue("barriers_accessing_cooking_fuel: {barriers_accessing_cooking_fuel}, but cooking_fuel_access: {cooking_fuel_access}"),
@@ -238,7 +238,7 @@ df_access_to_electricity <- df_tool_data %>%
          time_walking_to_electricity_source == "less_than_30_minutes") %>%
   mutate(i.check.type = "change_response",
          i.check.name = "access_to_electricity",
-         i.check.current_value = as.character(access_to_electricity),
+         i.check.current_value = access_to_electricity,
          i.check.value = "",
          i.check.issue_id = "logic_c_access_to_electricity_no",
          i.check.issue = glue("access_to_electricity: {access_to_electricity}, but 
