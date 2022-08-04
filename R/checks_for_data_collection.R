@@ -106,24 +106,30 @@ add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_ot
 
 # logical checks for different responses ----------------------------------
 
-# educ_level_above_primary_but_cannot_count_money_in_possession_calculate_money_left_calculate_money_saved_for_future_calculate_money_items_can_buy
+# educ level above primary but cannot count money in possession
 
 df_educ_level_above_primary_but_cannot_count_money <- df_tool_data %>%
-  filter(respondent_education %in% c("completed_primary", "incomplete_secondary", "completed_secondary", "incomplete_tertiary", "completed_tertiary")&
+  filter(respondent_education %in% c("completed_primary", "incomplete_secondary", "completed_secondary", "incomplete_tertiary", "completed_tertiary") ,
            knowledge_financial_literacy =="none") %>% 
-  mutate(i.check.type = "change_response",
-         i.check.name = "respondent_education",
-         i.check.current_value = as.character(respondent_education),
-         i.check.value = "",
+  mutate(i.check.type = "add_option",
+         i.check.name = "knowledge_financial_literacy",
+         i.check.current_value = knowledge_financial_literacy,
+         i.check.value = "count_money_in_possession",
          i.check.issue_id = "logic_c_educ_level_above_primary_but_cannot_count",
-         i.check.issue = glue("knowledge_financial_literacy:{knowledge_financial_literacy}"),
+         i.check.issue = glue("respondent_education:{respondent_education}"),
          i.check.other_text = "",
          i.check.checked_by = "",
          i.check.checked_date = as_date(today()),
          i.check.comment = "FO to follow up with enumerator", 
          i.check.reviewed = "",
          i.check.adjust_log = "",
-         i.check.so_sm_choices = "") %>% 
+         i.check.so_sm_choices = "") %>%
+  slice(rep(1:n(), each = 2)) %>% 
+  group_by(i.check.uuid, i.check.start_date, i.check.enumerator_id, i.check.district_name, 
+           i.check.point_number, i.check.type,  i.check.name,  i.check.current_value) %>% 
+  mutate(rank = row_number(),
+         i.check.type = ifelse(rank == 2, "remove_option", i.check.type),
+         i.check.value = ifelse(rank == 2, i.check.current_value, i.check.value)) %>%
   dplyr::select(starts_with("i.check"))%>% 
   rename_with(~str_replace(string = .x, pattern = "i.check.", replacement = ""))
 
