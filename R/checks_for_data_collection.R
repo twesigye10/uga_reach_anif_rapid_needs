@@ -142,7 +142,7 @@ df_money_usage <- df_tool_data %>%
                                      "completed_tertiary") , money_usage == "none") %>%
   mutate(i.check.type = "remove_option",
          i.check.name = "money_usage",
-         i.check.current_value = as.character(money_usage),
+         i.check.current_value = money_usage,
          i.check.value = "",
          i.check.issue_id = "logic_c_money_usage",
          i.check.issue = glue("respondent_education: {respondent_education}, but money_usage: {money_usage}"),
@@ -159,14 +159,14 @@ df_money_usage <- df_tool_data %>%
 add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_money_usage")
 
 
-# If average meals eaten a day i.e "average_daily_fd_consumption" = "three_meals" and "more_than_three_meals" and amount of food hh 
+# average meals eaten a day i.e "average_daily_fd_consumption" = "three_meals" and "more_than_three_meals" and amount of food hh 
 # members are currently eating i.e. "food_amount_change = "we_are_now_eating_less_than_we_were_in_our_home_country", check
 df_average_daily_fd_consumption <- df_tool_data %>% 
   filter(average_daily_fd_consumption %in% c("more_than_three_meals", "three_meals") , 
          food_amount_change == "we_are_now_eating_less_than_we_were_in_our_home_country") %>%
   mutate(i.check.type = "change_response",
          i.check.name = "food_amount_change",
-         i.check.current_value = as.character(food_amount_change),
+         i.check.current_value = food_amount_change,
          i.check.value = "",
          i.check.issue_id = "logic_c_food_amount_change",
          i.check.issue = glue("food_amount_change: {food_amount_change}, but average_daily_fd_consumption: {average_daily_fd_consumption}"),
@@ -183,8 +183,8 @@ df_average_daily_fd_consumption <- df_tool_data %>%
 add_checks_data_to_list(input_list_name = "logic_output", input_df_name = "df_average_daily_fd_consumption")
 
 
-# If average meals eaten a day i.e average_daily_fd_consumption = "less_than_two_meals" and 
-# food_amount_change = "we_are_now_eating_more_than_we_were_in_our_home_country", check
+# average meals eaten a day i.e average_daily_fd_consumption = "less_than_two_meals" and 
+# food_amount_change = "we_are_now_eating_more_than_we_were_in_our_home_country"
 df_food_amount_change <- df_tool_data %>% 
   filter(food_amount_change %in% c("we_are_now_eating_more_than_we_were_in_our_home_country") , 
          average_daily_fd_consumption == "less_than_two_meals") %>%
@@ -363,7 +363,7 @@ df_food_stock_category <- df_tool_data %>%
   filter(average_daily_fd_consumption %in% c("three_meals", "more_than_three_meals"), food_category == "none") %>%
   mutate(i.check.type = "change_response",
          i.check.name = "food_category",
-         i.check.current_value = as.character(food_category),
+         i.check.current_value = food_category,
          i.check.value = "",
          i.check.issue_id = "logic_c_food_category_stock_none",
          i.check.issue = glue("food_category: {food_category}, 
